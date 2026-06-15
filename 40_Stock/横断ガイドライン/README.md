@@ -45,9 +45,9 @@
 ### 更新手順
 
 1. このフォルダの `文章作法.md`（正典）を編集する。
-2. `bash _tools/sync.sh sync` を実行 → 全コピーへ反映＋該当`.skill`を再パッケージ（対象は`_tools/sync-manifest.tsv`で管理）。
+2. `bash _tools/build.sh --sync` を実行 → 全コピーへ反映＋該当`.skill`を再パッケージ＋verify（対象は`_tools/sync-manifest.tsv`で管理）。
 3. 再パッケージされたSkillは Save skill カードから再登録する（[[skill-update-one-click-flow]]）。
 
-> ズレ確認だけなら `bash _tools/sync.sh check`（非破壊）。文章作法もPMBOK基準資料も同じ1ツールで同期・検査する。
+> ズレ確認だけなら `bash _tools/build.sh --check`（非破壊）。`build.sh` が同期・検査・パッケージ化・点検の唯一の入口。
 
 > コピーは正典をそのまま写す（ヘッダ等は足さない）。正典＝コピーがバイト一致である状態を保つ。

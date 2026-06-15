@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 共有関数ライブラリ。sync.sh / build.sh から source して使う。単体実行しない。
+# 共有関数ライブラリ。build.sh から source して使う（sync.sh は build.sh への薄いラッパー）。単体実行しない。
 # ツール間で同じ処理を二重実装しない（食い違い＝裏側バグの種）ための集約場所。
 
 # md5（GNU coreutils=md5sum / macOS=md5 の両対応）
