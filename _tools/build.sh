@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
-# Skillパッケージ化の唯一の入口。手作業zipを禁じ、壊れビルド（0バイト・ルート不正・ゴミ残り）を構造的に防ぐ。
+# Skillパッケージ化＋共通項同期の唯一の入口。手作業zipを禁じ、壊れビルド（0バイト・ルート不正・ゴミ残り）を構造的に防ぐ。
 #   bash _tools/build.sh <skillディレクトリ>  … そのSkillを正しく再パッケージ＋検証＋全体verify
-#   bash _tools/build.sh --all                … 既存の .skill を全て作り直す＋検証
+#   bash _tools/build.sh --all                … SKILL.mdを持つ全Skillをビルド＋検証
 #   bash _tools/build.sh --verify             … 非破壊：全 .skill の健全性＋ゴミ＋ドリフトを点検（毎日の自動チェック用）
+#   bash _tools/build.sh --sync               … 正典→コピーを反映し、影響する .skill を再パッケージ＋verify
+#   bash _tools/build.sh --check              … 正典↔コピーのズレだけ検査（非破壊。verify の一部）
 set -euo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(cd "$HERE/.." && pwd)"
@@ -49,17 +51,42 @@ build_one() {
 }
 
 build_all() {
-  while IFS= read -r f; do
-    [[ -z "$f" ]] && continue
-    local dir="${f%.skill}"
-    [[ -f "$dir/SKILL.md" ]] && { repackage_skill "$dir" && echo "built → ${dir#$ROOT/}.skill"; }
-  done < <(find "$ROOT/20_Skills" -type f -name '*.skill' 2>/dev/null | sort)
+  # list_skill_dirsベース: 既存.skillだけでなく未ビルドのSkillも拾う
+  while IFS= read -r d; do
+    [[ -z "$d" ]] && continue
+    repackage_skill "$d" && echo "built → ${d#$ROOT/}.skill"
+  done < <(list_skill_dirs "$ROOT" | sort -u)
+}
+
+# 正典→コピーを反映し、影響する .skill を再パッケージ（旧 sync.sh sync）
+do_sync() {
+  [[ -f "$MANIFEST" ]] || { echo "ERROR: マニフェストが無い: $MANIFEST" >&2; exit 2; }
+  local -A skilldirs=()
+  local master copy
+  while IFS=$'\t' read -r master copy _; do
+    [[ -z "${master// }" || "${master:0:1}" == "#" ]] && continue
+    local m="$ROOT/$master" c="$ROOT/$copy"
+    [[ -f "$m" ]] || { echo "SKIP 正典なし: $master" >&2; continue; }
+    mkdir -p "$(dirname "$c")"; cp "$m" "$c"; echo "copied → $copy"
+    [[ "$copy" == 20_Skills/*/references/* ]] && skilldirs["${copy%%/references/*}"]=1
+  done < "$MANIFEST"
+  for sd in "${!skilldirs[@]}"; do
+    if [[ -f "$ROOT/$sd.skill" ]]; then
+      repackage_skill "$ROOT/$sd" && echo "repackaged → $sd.skill"
+    fi
+  done
+  echo "--- sync 完了 ---"
 }
 
 cmd="${1:-}"
 case "$cmd" in
   --verify) verify ;;
+  --check)  [[ -f "$MANIFEST" ]] || { echo "ERROR: マニフェストが無い" >&2; exit 2; }
+            check_drift "$ROOT" "$MANIFEST" && echo "✅ 全コピーが正典と一致" ;;
+  --sync)   do_sync; echo; verify ;;
   --all)    build_all; echo; verify ;;
-  ""|-h|--help) echo "usage: bash _tools/build.sh <skillディレクトリ> | --all | --verify" >&2; exit 2 ;;
+  ""|-h|--help)
+    echo "usage: bash _tools/build.sh <skillディレクトリ> | --all | --verify | --sync | --check" >&2
+    exit 2 ;;
   *)        build_one "$cmd"; echo; verify ;;
 esac
