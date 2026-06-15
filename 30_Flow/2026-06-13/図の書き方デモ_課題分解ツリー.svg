@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" font-family="'Yu Gothic','Hiragino Sans','Noto Sans JP',sans-serif">
+  <rect x="0" y="0" width="800" height="500" fill="#FFFFFF"/>
+
+  <!-- 1図1メッセージ：タイトルは結論を述べる -->
+  <text x="30" y="34" font-size="19" font-weight="bold" fill="#1F5C99">受注リードタイムの長期化は、3つの構造的要因に分解できる</text>
+  <line x1="30" y1="46" x2="770" y2="46" stroke="#1F5C99" stroke-width="2"/>
+
+  <!-- 接続線（細く・装飾なし） -->
+  <g stroke="#B9C7D6" stroke-width="1.5" fill="none">
+    <line x1="230" y1="270" x2="275" y2="150"/>
+    <line x1="230" y1="270" x2="275" y2="270"/>
+    <line x1="230" y1="270" x2="275" y2="390"/>
+    <line x1="445" y1="150" x2="545" y2="115"/>
+    <line x1="445" y1="150" x2="545" y2="185"/>
+    <line x1="445" y1="270" x2="545" y2="245"/>
+    <line x1="445" y1="270" x2="545" y2="300"/>
+    <line x1="445" y1="390" x2="545" y2="390"/>
+  </g>
+
+  <!-- 根：メインカラー塗り -->
+  <rect x="30" y="243" width="200" height="54" rx="6" fill="#1F5C99"/>
+  <text x="130" y="266" font-size="13" fill="#FFFFFF" text-anchor="middle">課題</text>
+  <text x="130" y="285" font-size="14" font-weight="bold" fill="#FFFFFF" text-anchor="middle">受注リードタイムが長い</text>
+
+  <!-- 第1階層：ベースカラー塗り＋メイン枠 -->
+  <g>
+    <rect x="275" y="127" width="170" height="46" rx="6" fill="#DCE9F5" stroke="#1F5C99" stroke-width="1.5"/>
+    <text x="360" y="155" font-size="14" font-weight="bold" fill="#1F5C99" text-anchor="middle">情報の分断</text>
+    <rect x="275" y="247" width="170" height="46" rx="6" fill="#DCE9F5" stroke="#1F5C99" stroke-width="1.5"/>
+    <text x="360" y="275" font-size="14" font-weight="bold" fill="#1F5C99" text-anchor="middle">承認の停滞</text>
+    <rect x="275" y="367" width="170" height="46" rx="6" fill="#DCE9F5" stroke="#1F5C99" stroke-width="1.5"/>
+    <text x="360" y="395" font-size="14" font-weight="bold" fill="#1F5C99" text-anchor="middle">業務の属人化</text>
+  </g>
+
+  <!-- 第2階層：白塗り・細枠。アクセントは1か所だけ -->
+  <g font-size="13" fill="#222222">
+    <!-- 最優先＝アクセント（暖色・数%の面積） -->
+    <rect x="545" y="95" width="210" height="40" rx="5" fill="#FDECEA" stroke="#C0392B" stroke-width="2"/>
+    <text x="556" y="120" font-size="13" fill="#222222">見積が社内で何度も往復</text>
+
+    <rect x="545" y="165" width="210" height="40" rx="5" fill="#FFFFFF" stroke="#C9D6E2" stroke-width="1.2"/>
+    <text x="556" y="190">在庫・納期が見えない</text>
+
+    <rect x="545" y="225" width="210" height="40" rx="5" fill="#FFFFFF" stroke="#C9D6E2" stroke-width="1.2"/>
+    <text x="556" y="250">承認者不在で停滞</text>
+
+    <rect x="545" y="280" width="210" height="40" rx="5" fill="#FFFFFF" stroke="#C9D6E2" stroke-width="1.2"/>
+    <text x="556" y="305">承認ルートが不明確</text>
+
+    <rect x="545" y="370" width="210" height="40" rx="5" fill="#FFFFFF" stroke="#C9D6E2" stroke-width="1.2"/>
+    <text x="556" y="395">手順が担当者の頭の中</text>
+  </g>
+
+  <!-- 凡例（アクセントの意味）：使ったので添える（表と数値の見せ方 D） -->
+  <rect x="30" y="438" width="14" height="14" rx="3" fill="#FDECEA" stroke="#C0392B" stroke-width="2"/>
+  <text x="52" y="450" font-size="12" fill="#444444">＝ 最優先で着手する課題</text>
+
+  <!-- フッター：このデモが効かせている規約 -->
+  <text x="30" y="478" font-size="11" fill="#8A97A4">図の書き方デモ ｜ 定性図＝分解＝ツリー（中核）｜ 色は3色（青基調・赤は最優先の1か所のみ）｜ 1図1メッセージ ｜ 影・3D・余計な罫線なし</text>
+</svg>

@@ -1,0 +1,54 @@
+{
+  "projects": [
+    {
+      "name": "山藤商事 生成AI/DX推進",
+      "milestones": [
+        { "date": "2026-08-14", "label": "段階1ゲート(試行開始?)", "color": "#ef4444" }
+      ],
+      "tasks": [
+        {
+          "id": "1",
+          "name": "段階1 見える化",
+          "children": [
+            { "id": "1.1", "name": "現場ヒアリング", "qty": 1, "hours": 24, "assignee": "当方/営業責任者",
+              "plan": { "start": "2026-07-06", "end": "2026-07-17" },
+              "actual": { "start": null, "end": null }, "note": "→As-Isメモ(仮日付)" },
+            { "id": "1.2", "name": "業務フロー可視化(As-Is)", "qty": 1, "hours": 24, "assignee": "当方",
+              "plan": { "start": "2026-07-13", "end": "2026-07-27" },
+              "actual": { "start": null, "end": null }, "note": "→As-Isメモ(仮日付)" },
+            { "id": "1.3", "name": "失敗要因調査", "qty": 1, "hours": 16, "assignee": "当方/佐藤",
+              "plan": { "start": "2026-07-13", "end": "2026-07-24" },
+              "actual": { "start": null, "end": null }, "note": "→要因レポート / R-01対応(仮日付)" },
+            { "id": "1.4", "name": "対象業務の選定", "qty": 1, "hours": 8, "assignee": "現場",
+              "plan": { "start": "2026-07-28", "end": "2026-08-07" },
+              "actual": { "start": null, "end": null }, "note": "→PoC対象決定 / ★律速(クリティカルパス)" }
+          ]
+        },
+        {
+          "id": "2",
+          "name": "段階2 小さく試す(骨格)",
+          "children": [
+            { "id": "2.1", "name": "見積・報告書PoC", "qty": 1, "hours": 0, "assignee": "",
+              "plan": { "start": null, "end": null },
+              "actual": { "start": null, "end": null }, "note": "🟡ゲート後に詳細化 / 関所:入力情報の線引き(R-02漏洩)を試行前に確定" },
+            { "id": "2.2", "name": "経営数値の要件整理(並行)", "qty": 1, "hours": 0, "assignee": "",
+              "plan": { "start": null, "end": null },
+              "actual": { "start": null, "end": null }, "note": "🟡要件メモ・データ所在" }
+          ]
+        },
+        {
+          "id": "3",
+          "name": "段階3 評価と次計画(骨格)",
+          "children": [
+            { "id": "3.1", "name": "効果測定", "qty": 1, "hours": 0, "assignee": "",
+              "plan": { "start": null, "end": null },
+              "actual": { "start": null, "end": null }, "note": "🟡前後比較＋現場の声" },
+            { "id": "3.2", "name": "次期計画/見直し案 提示", "qty": 1, "hours": 0, "assignee": "",
+              "plan": { "start": null, "end": null },
+              "actual": { "start": null, "end": null }, "note": "🟡3軸評価(事業価値/運用適合/リスク)" }
+          ]
+        }
+      ]
+    }
+  ]
+}
