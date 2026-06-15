@@ -11,10 +11,16 @@ portable_md5() {
 
 # Skillソースdir（中にSKILL.md）から隣の <name>.skill を正しく作り直す。zipルート=<name>/。
 repackage_skill() {
-  local dir="$1" name parent
+  local dir="$1" name parent tmpd rc=0
   [[ -d "$dir" ]] || { echo "ERROR: skillディレクトリが無い: $dir" >&2; return 1; }
   name="$(basename "$dir")"; parent="$(dirname "$dir")"
-  ( cd "$parent" && rm -f "$name.skill" && zip -r -q -X "$name.skill" "$name" -x '*.DS_Store' )
+  # マウント上では zip の原子的 rename(temp→本名) が拒否され、新規ビルドが失敗し中途半端な temp が残る。
+  # そこで zip は一時領域で組み立て、cp で配置する（cp の上書きはマウント上でも通ることを実証済）。
+  tmpd="$(mktemp -d)" || { echo "ERROR: 一時領域を作れない" >&2; return 1; }
+  ( cd "$parent" && zip -r -q -X "$tmpd/$name.skill" "$name" -x '*.DS_Store' ) || rc=1
+  [[ $rc -eq 0 ]] && { cp -f "$tmpd/$name.skill" "$parent/$name.skill" || rc=1; }
+  rm -rf "$tmpd"
+  return $rc
 }
 
 # .skillファイルの健全性。0=健全、非0=問題（理由を出力）。0バイト・壊れzip・ルート不正・SKILL.md欠落を検出。
