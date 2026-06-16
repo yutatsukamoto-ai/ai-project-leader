@@ -86,3 +86,67 @@ check_map_consistency() {
   echo "--- map: 実在${total}件中 未記載${miss}・要確認${stale} ---"
   [[ $miss -eq 0 && $stale -eq 0 ]]
 }
+
+# 配布除外・履歴除外にすべきファイルがGit追跡下に残っていないかを検査する。
+# .gitignoreは新規追加を止めるだけなので、既に追跡済みの実データ/著作物/生成物はここで検出する。
+check_forbidden_tracked_paths() {
+  local root="$1" problems=0 f
+  if ! git -C "$root" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    echo "ℹ️  Git管理外のためスキップ"
+    return 0
+  fi
+
+  local denied_dirs=(
+    "30_Flow/2026-06-12/実案件_八束電工"
+    "30_Flow/2026-06-12/Skillテスト_0-1_協和精機"
+    "_backups"
+  )
+
+  for dir in "${denied_dirs[@]}"; do
+    while IFS= read -r f; do
+      [[ -z "$f" ]] && continue
+      echo "❌ 追跡禁止パスがGit管理下: $f"
+      problems=$((problems+1))
+    done < <(git -C "$root" -c core.quotePath=false ls-files -- "$dir")
+  done
+
+  while IFS= read -r f; do
+    [[ -z "$f" ]] && continue
+    case "$f" in
+      "10_参考資料/PMBOK第8版_40プロセス一覧.md"|"10_参考資料/PMBOK第8版_6原則一覧.md") ;;
+      *) echo "❌ 著作物側の追跡疑い: $f"; problems=$((problems+1)) ;;
+    esac
+  done < <(git -C "$root" -c core.quotePath=false ls-files -- "10_参考資料")
+
+  while IFS= read -r f; do
+    [[ -z "$f" ]] && continue
+    echo "❌ 再生成可能な.skillがGit管理下: $f"
+    problems=$((problems+1))
+  done < <(git -C "$root" -c core.quotePath=false ls-files -- "*.skill")
+
+  while IFS= read -r f; do
+    [[ -z "$f" ]] && continue
+    echo "❌ バックアップ/一時ファイルがGit管理下: $f"
+    problems=$((problems+1))
+  done < <(git -C "$root" -c core.quotePath=false ls-files -- "*.bak" ".DS_Store" ".DS_Store?")
+
+  if [[ $problems -eq 0 ]]; then
+    echo "✅ 追跡禁止パスなし"
+    return 0
+  fi
+  echo "--- forbidden tracked: ${problems}件 ---"
+  return 1
+}
+
+# 配布前に解消すべきTODOを一覧化する。現時点ではSkill内の配布TODOを対象にする。
+check_distribution_todos() {
+  local root="$1" hits
+  hits="$(grep -RIn --include='*.md' '配布TODO' "$root/20_Skills" 2>/dev/null || true)"
+  if [[ -z "$hits" ]]; then
+    echo "✅ 配布TODOなし"
+    return 0
+  fi
+  echo "$hits" | sed "s#$root/##" | sed 's/^/⚠️  /'
+  echo "--- distribution TODO: $(printf '%s\n' "$hits" | grep -c .)件 ---"
+  return 1
+}

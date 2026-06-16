@@ -5,6 +5,7 @@
 #   bash _tools/build.sh --verify             … 非破壊：全 .skill の健全性＋ゴミ＋ドリフトを点検（毎日の自動チェック用）
 #   bash _tools/build.sh --sync               … 正典→コピーを反映し、影響する .skill を再パッケージ＋verify
 #   bash _tools/build.sh --check              … 正典↔コピーのズレだけ検査（非破壊。verify の一部）
+#   bash _tools/build.sh --release-check      … 配布前ゲート：verify＋追跡禁止パス＋配布TODOを点検
 set -euo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(cd "$HERE/.." && pwd)"
@@ -35,6 +36,9 @@ verify() {
 
   echo "=== 成果物マップ↔実構成 ==="
   check_map_consistency "$ROOT" "$ROOT/20_Skills/成果物マップ.md" || problems=$((problems+1))
+
+  echo "=== Git追跡禁止パス ==="
+  check_forbidden_tracked_paths "$ROOT" || problems=$((problems+1))
 
   echo "================================"
   if [[ $problems -eq 0 ]]; then echo "✅ verify: 異常なし"; return 0
@@ -78,15 +82,29 @@ do_sync() {
   echo "--- sync 完了 ---"
 }
 
+release_check() {
+  local problems=0
+  verify || problems=$((problems+1))
+
+  echo
+  echo "=== 配布TODO ==="
+  check_distribution_todos "$ROOT" || problems=$((problems+1))
+
+  echo "================================"
+  if [[ $problems -eq 0 ]]; then echo "✅ release-check: 配布前ゲートOK"; return 0
+  else echo "⚠️  release-check: ${problems}種類の問題あり（上記）"; return 1; fi
+}
+
 cmd="${1:-}"
 case "$cmd" in
   --verify) verify ;;
   --check)  [[ -f "$MANIFEST" ]] || { echo "ERROR: マニフェストが無い" >&2; exit 2; }
             check_drift "$ROOT" "$MANIFEST" && echo "✅ 全コピーが正典と一致" ;;
+  --release-check) release_check ;;
   --sync)   do_sync; echo; verify ;;
   --all)    build_all; echo; verify ;;
   ""|-h|--help)
-    echo "usage: bash _tools/build.sh <skillディレクトリ> | --all | --verify | --sync | --check" >&2
+    echo "usage: bash _tools/build.sh <skillディレクトリ> | --all | --verify | --sync | --check | --release-check" >&2
     exit 2 ;;
   *)        build_one "$cmd"; echo; verify ;;
 esac
