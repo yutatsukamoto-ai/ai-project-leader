@@ -27,7 +27,7 @@ check_absent() {
 }
 
 check_file "$DIST/.claude/settings.json"
-check_file "$DIST/.claude/agents/llm-judge.md"
+check_file "$DIST/.claude/agents/eval-judge.md"
 
 skill_count="$(find "$DIST/.claude/skills" -type f -name SKILL.md 2>/dev/null | wc -l | tr -d ' ')"
 if [[ "$skill_count" -gt 0 ]]; then

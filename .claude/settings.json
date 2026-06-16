@@ -1,6 +1,50 @@
 {
-  "_comment": "hooks・permissions は後で設計",
-  "hooks": {},
+  "_comment": "hooks・permissions は段階的に設計。Claude Code版 Phase 1-4 の最小構成。",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/gate-check.sh"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/auto-build.sh"
+          }
+        ]
+      }
+    ],
+    "TaskCompleted": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/auto-eval.sh"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "あなたはClaude CodeのStop hook判定者です。直前の作業が以下の条件に該当しない場合は必ず {\"ok\": true} のJSONだけを返してください。条件: (1)フェーズ移行を伴う成果物が完成した (2)不可逆な分岐に到達した (3)成果物やタスクのまとまりが片付いた。該当する場合は {\"ok\": false, \"reason\": \"チェックポイント・ルーチンを実行してください: 1. 何が片付いたかを一行で確認 2. 宿題を正典（00_プロジェクト管理/）から拾い直して一覧化 3. この一段落だからやるべき衛生作業を点検（入口文書の鮮度チェック・SSOT整合・バックアップ） 4. 次の一手を理由つきで推奨（判断はユーザー） 5. 必要なら入口の地図を更新＋git commitを提案\"} のJSONだけを返してください。入力: $ARGUMENTS",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  },
   "permissions": {
     "allowedTools": []
   }
