@@ -6,6 +6,7 @@
 #   bash _tools/build.sh --sync               … 正典→コピーを反映し、影響する .skill を再パッケージ＋verify
 #   bash _tools/build.sh --check              … 正典↔コピーのズレだけ検査（非破壊。verify の一部）
 #   bash _tools/build.sh --release-check      … 配布前ゲート：verify＋追跡禁止パス＋配布TODOを点検
+#   bash _tools/build.sh --trace <案件フォルダ> … chain-trace.jsonを整形表示
 set -euo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(cd "$HERE/.." && pwd)"
@@ -106,8 +107,14 @@ case "$cmd" in
   --release-check) release_check ;;
   --sync)   do_sync; echo; verify ;;
   --all)    build_all; echo; verify ;;
+  --trace)
+    trace_arg="${2:-}"
+    [[ -n "$trace_arg" ]] || { echo "usage: bash _tools/build.sh --trace <案件フォルダパス>" >&2; exit 2; }
+    trace_dir="${trace_arg%/}"; [[ "$trace_dir" = /* ]] || trace_dir="$ROOT/$trace_dir"
+    show_trace "$trace_dir"
+    ;;
   ""|-h|--help)
-    echo "usage: bash _tools/build.sh <skillディレクトリ> | --all | --verify | --sync | --check | --release-check" >&2
+    echo "usage: bash _tools/build.sh <skillディレクトリ> | --all | --verify | --sync | --check | --release-check | --trace <案件フォルダ>" >&2
     exit 2 ;;
   *)        build_one "$cmd"; echo; verify ;;
 esac

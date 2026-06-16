@@ -138,6 +138,70 @@ check_forbidden_tracked_paths() {
   return 1
 }
 
+# chain-trace.jsonの整形表示。$1=案件フォルダ（絶対パス）。
+show_trace() {
+  local dir="$1" trace="$1/chain-trace.json"
+  [[ -f "$trace" ]] || { echo "ERROR: chain-trace.json が無い: $dir" >&2; return 2; }
+
+  # jqが無ければpython3のjsonで代替
+  python3 - "$trace" <<'PYEOF'
+import json, sys, re
+
+with open(sys.argv[1], encoding='utf-8') as f:
+    d = json.load(f)
+
+name = d.get("案件", "不明")
+phase = d.get("現在フェーズ", "不明")
+entries = d.get("entries", [])
+start = d.get("開始日", "不明")
+
+print(f"=== チェーントレース: {name} ===")
+print(f"現在フェーズ: {phase}  |  エントリ: {len(entries)}件  |  開始: {start}")
+print()
+
+# ヘッダ
+print(f" {'#':<4} {'Skill':<28} {'Phase':<20} {'検査':<14} {'時間':<6} 備考")
+print(f" {'---':<4} {'----------------------------':<28} {'--------------------':<20} {'--------------':<14} {'------':<6} ---")
+
+for e in entries:
+    sk = e.get("skill", "")
+    if sk == "phase-transition":
+        out = e.get("output", "")
+        print(f" {'-':<4} [{out}]")
+    else:
+        seq = str(e.get("seq", ""))
+        ph = e.get("phase", "")
+        ins = e.get("inspection", "")
+        dur = f'{e["duration_min"]}m' if e.get("duration_min") else "—"
+        note = e.get("notes", "") or e.get("inspection_notes", "")
+        print(f" {seq:<4} {sk:<28} {ph:<20} {ins:<14} {dur:<6} {note}")
+
+print()
+print("=== 集計 ===")
+
+ok = warn = ng = tail = 0
+tailoring_items = []
+for e in entries:
+    if e.get("skill") in ("phase-transition", "approval-gate"):
+        continue
+    ins = e.get("inspection", "")
+    for m in re.finditer(r"✅(\d+)", ins):
+        ok += int(m.group(1))
+    for m in re.finditer(r"🟡(\d+)", ins):
+        warn += int(m.group(1))
+    for m in re.finditer(r"❌(\d+)", ins):
+        ng += int(m.group(1))
+    for t in (e.get("tailoring") or []):
+        tailoring_items.append(t)
+        tail += 1
+
+print(f"検査: ✅{ok} 🟡{warn} ❌{ng}")
+print(f"テーラリング判断: {tail}件")
+for t in tailoring_items:
+    print(f"  - {t}")
+PYEOF
+}
+
 # 配布前に解消すべきTODOを一覧化する。現時点ではSkill内の配布TODOを対象にする。
 check_distribution_todos() {
   local root="$1" hits
