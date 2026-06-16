@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>プロジェクトダッシュボード</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js" integrity="sha384-iU8HYtnGQ8Cy4zl7gbNMOhsDTTKX02BTXptVP/vqAWIaTfM7isw76iyZCsjL2eVi" crossorigin="anonymous"></script>
+<style>
+:root{color-scheme:light;--bg:#f1f5f9;--card:#fff;--text:#0f172a;--text2:#64748b;--border:#e2e8f0;--primary:#2563eb;--success:#059669;--warn:#d97706;--danger:#dc2626;--radius:12px;--shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;padding:20px}
+.ctr{max-width:960px;margin:0 auto}
+.hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.hdr h1{font-size:18px;font-weight:700;display:flex;align-items:center;gap:8px}
+.case-sel{padding:7px 12px;border:1px solid var(--border);border-radius:8px;background:var(--card);font-size:13px;cursor:pointer;max-width:260px}
+.info{background:var(--card);border-radius:var(--radius);padding:16px 20px;box-shadow:var(--shadow);margin-bottom:16px}
+.info-name{font-size:17px;font-weight:700;margin-bottom:2px}
+.info-meta{font-size:12px;color:var(--text2);display:flex;gap:14px;flex-wrap:wrap}
+.info-meta span{display:inline-flex;align-items:center;gap:3px}
+.pipe{background:var(--card);border-radius:var(--radius);padding:20px 24px;box-shadow:var(--shadow);margin-bottom:16px}
+.pipe-track{display:flex;align-items:flex-start;justify-content:space-between;position:relative;padding:0 16px}
+.pipe-track::before{content:'';position:absolute;top:15px;left:36px;right:36px;height:3px;background:var(--border);z-index:0}
+.pipe-ph{display:flex;flex-direction:column;align-items:center;z-index:1;gap:6px;min-width:60px}
+.ph-dot{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;transition:all .3s}
+.ph-dot.done{background:var(--success)}
+.ph-dot.now{background:var(--primary);animation:pulse 2s infinite;box-shadow:0 0 0 4px rgba(37,99,235,.2)}
+.ph-dot.wait{background:var(--border);color:var(--text2)}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 4px rgba(37,99,235,.2)}50%{box-shadow:0 0 0 8px rgba(37,99,235,.08)}}
+.ph-lbl{font-size:11px;color:var(--text2);font-weight:500;text-align:center}
+.ph-lbl.on{color:var(--text);font-weight:700}
+.ph-cnt{font-size:10px;color:var(--text2)}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.mc{background:var(--card);border-radius:var(--radius);padding:14px 16px;box-shadow:var(--shadow);border-left:4px solid var(--border)}
+.mc-lbl{font-size:11px;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+.mc-val{font-size:26px;font-weight:700;margin:2px 0}
+.mc-sub{font-size:11px;color:var(--text2)}
+.health{background:linear-gradient(135deg,#eff6ff 0%,#f0fdf4 100%);border:1px solid #bfdbfe;border-radius:var(--radius);padding:14px 18px;margin-bottom:16px}
+.health h3{font-size:12px;color:var(--primary);font-weight:600;margin-bottom:6px}
+.health-txt{font-size:13px;line-height:1.7}
+.health-wait{color:var(--text2);font-style:italic}
+.charts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.ch-card{background:var(--card);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
+.ch-card h3{font-size:13px;font-weight:600;margin-bottom:10px}
+.ch-box{position:relative;height:190px}
+.tbl-card{background:var(--card);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);margin-bottom:12px;overflow-x:auto}
+.tbl-card h3{font-size:13px;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;padding:6px 10px;border-bottom:2px solid var(--border);color:var(--text2);font-weight:500;font-size:11px;white-space:nowrap}
+td{padding:6px 10px;border-bottom:1px solid var(--border);vertical-align:top}
+tr:last-child td{border-bottom:none}
+.badge{display:inline-block;padding:1px 7px;border-radius:99px;font-size:10px;font-weight:600;white-space:nowrap}
+.b-hi{background:#fef2f2;color:#991b1b}.b-md{background:#fffbeb;color:#92400e}.b-lo{background:#f0fdf4;color:#166534}
+.b-open{background:#eff6ff;color:#1e40af}.b-act{background:#fef3c7;color:#92400e}.b-done{background:#dcfce7;color:#166534}
+.b-watch{background:#f5f3ff;color:#5b21b6}
+.empty{text-align:center;padding:24px;color:var(--text2);font-size:13px}
+.ts{text-align:center;font-size:11px;color:var(--text2);margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
+@media(max-width:640px){.metrics{grid-template-columns:repeat(2,1fr)}.charts{grid-template-columns:1fr}.hdr{flex-direction:column;gap:10px;align-items:flex-start}}
+</style>
+</head>
+<body>
+<div class="ctr">
+  <div class="hdr">
+    <h1>📊 プロジェクトダッシュボード</h1>
+    <select class="case-sel" id="csel" onchange="pick(this.value)"></select>
+  </div>
+  <div class="info"><div class="info-name" id="pName"></div><div class="info-meta" id="pMeta"></div></div>
+  <div class="pipe"><div class="pipe-track" id="pipeT"></div></div>
+  <div class="metrics" id="mCards"></div>
+  <div class="health" id="hCard"><h3>🤖 AI ヘルスチェック</h3><div class="health-txt health-wait" id="hTxt">分析中...</div></div>
+  <div class="charts">
+    <div class="ch-card"><h3>フェーズ別 成果物</h3><div class="ch-box"><canvas id="cPhase"></canvas></div></div>
+    <div class="ch-card"><h3>検査結果サマリー</h3><div class="ch-box"><canvas id="cInsp"></canvas></div></div>
+  </div>
+  <div class="tbl-card"><h3>⚡ 課題一覧</h3><div id="tIssue"></div></div>
+  <div class="tbl-card"><h3>⚠️ リスク登録簿</h3><div id="tRisk"></div></div>
+  <div class="ts" id="tsLine"></div>
+</div>
+
+<script>
+// ── Embedded Data (regenerate artifact to refresh) ──
+const DATA = {"cases": [{"id": "2026-06-16/模擬案件_丸山製作所", "name": "丸山製作所 受注〜出荷プロセス改善", "phase": "05_終結", "start": "2026-06-16", "entries": [{"seq": 1, "skill": "project-charter", "phase": "01_立ち上げ", "inspection": "✅7 🟡0 ❌0", "output": "01_立ち上げ/01_プロジェクトチャーター_v0.1.md", "tailoring": []}, {"seq": 2, "skill": "stakeholder-register", "phase": "01_立ち上げ", "inspection": "✅7 🟡0 ❌0", "output": "01_立ち上げ/02_ステークホルダー登録簿_v0.1.md", "tailoring": []}, {"seq": 0, "skill": "phase-transition", "phase": "02_計画", "inspection": "", "output": "→ 02_計画", "tailoring": []}, {"seq": 3, "skill": "integrated-plan", "phase": "02_計画", "inspection": "✅7 🟡0 ❌0", "output": "02_計画/01_統合計画書_v0.1.md", "tailoring": ["スコープ管理計画: ○標準（中規模・スコープ安定）", "コスト管理計画: △軽く（予算枠固定・詳細不要）"]}, {"seq": 4, "skill": "risk-plan", "phase": "02_計画", "inspection": "✅7 🟡0 ❌0", "output": "02_計画/02_リスク管理計画_v0.1.md", "tailoring": []}, {"seq": 5, "skill": "communication-plan", "phase": "02_計画", "inspection": "✅7 🟡0 ❌0", "output": "02_計画/03_コミュニケーション計画_v0.1.md", "tailoring": []}, {"seq": 6, "skill": "wbs-builder", "phase": "02_計画", "inspection": "✅7 🟡0 ❌0", "output": "02_計画/04_WBS_v0.1.json", "tailoring": []}, {"seq": 0, "skill": "phase-transition", "phase": "03_実行", "inspection": "", "output": "→ 03_実行", "tailoring": []}, {"seq": 7, "skill": "issue-log", "phase": "03_実行", "inspection": "✅7 🟡0 ❌0", "output": "03_実行/01_課題管理表_v0.1.md", "tailoring": []}, {"seq": 0, "skill": "phase-transition", "phase": "04_監視コントロール", "inspection": "", "output": "→ 04_監視コントロール", "tailoring": []}, {"seq": 8, "skill": "status-report", "phase": "04_監視コントロール", "inspection": "✅7 🟡0 ❌0", "output": "04_監視コントロール/01_週次状況報告_W1_v0.1.md", "tailoring": []}, {"seq": 9, "skill": "change-log", "phase": "04_監視コントロール", "inspection": "✅7 🟡0 ❌0", "output": "04_監視コントロール/02_変更管理表_v0.1.md", "tailoring": []}, {"seq": 0, "skill": "phase-transition", "phase": "05_終結", "inspection": "", "output": "→ 05_終結", "tailoring": []}, {"seq": 10, "skill": "project-closeout", "phase": "05_終結", "inspection": "✅7 🟡0 ❌0", "output": "05_終結/01_終結報告書_v0.1.md", "tailoring": []}], "issues": [{"id": "I-01", "type": "判断待ち", "title": "小林様の委任範囲を合意する", "priority": "高", "assignee": "当社→大西様・小林様", "deadline": "①1週目", "status": "オープン"}, {"id": "I-02", "type": "作業課題", "title": "村上様への初回ヒアリング設計", "priority": "高", "assignee": "当社＋小林様", "deadline": "①1週目", "status": "オープン"}, {"id": "I-03", "type": "作業課題", "title": "藤田様にデータ抽出を依頼", "priority": "中", "assignee": "当社→小林様→藤田様", "deadline": "①3週目", "status": "オープン"}, {"id": "I-04", "type": "判断待ち", "title": "ISO改訂スケジュールを高橋様に確認", "priority": "中", "assignee": "小林様→高橋様", "deadline": "①2週目", "status": "オープン"}, {"id": "I-05", "type": "リスク対応", "title": "村上氏の温度感把握（R-A対応）", "priority": "高", "assignee": "当社", "deadline": "①2週目", "status": "オープン"}, {"id": "I-06", "type": "作業課題", "title": "As-Is業務フロー作成の準備", "priority": "中", "assignee": "当社", "deadline": "①4週目", "status": "オープン"}, {"id": "I-07", "type": "判断待ち", "title": "基幹保守切れの正確な時期を藤田様に確認", "priority": "低", "assignee": "藤田様", "deadline": "①3週目", "status": "オープン"}, {"id": "I-08", "type": "作業課題", "title": "定例の運用を小林様と合意", "priority": "中", "assignee": "当社＋小林様", "deadline": "①1週目", "status": "オープン"}], "risks": [{"id": "R-A", "cat": "組織・人", "name": "村上氏が協力を拒否（H5）", "prob": "中", "impact": "致命的", "strategy": "軽減", "status": "監視中"}, {"id": "R-B", "cat": "定着・変化", "name": "IT不信による消極的抵抗（H4）", "prob": "高", "impact": "高", "strategy": "軽減", "status": "監視中"}, {"id": "R-C", "cat": "組織・人", "name": "大西氏不在で判断遅延（H6）", "prob": "中", "impact": "中", "strategy": "軽減", "status": "監視中"}, {"id": "R-D", "cat": "スコープ・外部", "name": "基幹入替とスコープ混同（H7）", "prob": "低", "impact": "高", "strategy": "回避", "status": "監視中"}, {"id": "R-E", "cat": "スコープ・外部", "name": "①の結果が想定より悪い", "prob": "中", "impact": "中", "strategy": "受容", "status": "監視中"}, {"id": "R-F", "cat": "定着・変化", "name": "③で旧運用への回帰が起きる", "prob": "中", "impact": "高", "strategy": "軽減", "status": "未発生"}, {"id": "R-G", "cat": "技術・データ", "name": "オービック7からのデータ抽出が困難", "prob": "低", "impact": "中", "strategy": "軽減", "status": "未発生"}], "client": "株式会社丸山製作所（金属加工・精密切削、従業員280名、愛知県）", "sponsor": "大西様（取締役・管理部門統括、月半分出張）", "budget": "1,500万円", "zendan": 5}]};
+
+// ── Constants ──
+const PH=[
+  {k:'00_前段',l:'前段',c:'#818cf8'},
+  {k:'01_立ち上げ',l:'立ち上げ',c:'#a78bfa'},
+  {k:'02_計画',l:'計画',c:'#60a5fa'},
+  {k:'03_実行',l:'実行',c:'#34d399'},
+  {k:'04_監視コントロール',l:'監視',c:'#fbbf24'},
+  {k:'05_終結',l:'終結',c:'#f87171'}
+];
+let cases=DATA.cases,cur=null,chP=null,chI=null;
+
+function phIdx(k){return PH.findIndex(p=>p.k===k)}
+function phLbl(k){const p=PH.find(p=>p.k===k);return p?p.l:k}
+
+function init(){
+  if(!cases.length)return;
+  const sel=document.getElementById('csel');
+  sel.innerHTML=cases.map((c,i)=>'<option value="'+i+'">'+c.name+'</option>').join('');
+  const idx=cases.length-1;
+  sel.value=idx;
+  pick(idx);
+  document.getElementById('tsLine').textContent='データ取得: 2026-06-17 — チャットで「ダッシュボード更新して」と言うと最新データで再生成します';
+}
+
+function pick(i){
+  i=parseInt(i);cur=cases[i];
+  rInfo();rPipe();rMetrics();rCharts();rIssues();rRisks();rHealth();
+}
+
+function rInfo(){
+  document.getElementById('pName').textContent=cur.name;
+  const m=[];
+  if(cur.client)m.push('🏢 '+cur.client);
+  if(cur.sponsor)m.push('👤 '+cur.sponsor);
+  if(cur.budget)m.push('💰 '+cur.budget);
+  if(cur.start)m.push('📅 開始 '+cur.start);
+  m.push('📍 '+phLbl(cur.phase));
+  document.getElementById('pMeta').innerHTML=m.map(s=>'<span>'+s+'</span>').join('');
+}
+
+function rPipe(){
+  const ci=phIdx(cur.phase);
+  const t=document.getElementById('pipeT');
+  t.innerHTML=PH.map((p,i)=>{
+    const st=i<ci?'done':i===ci?'now':'wait';
+    const icon=st==='done'?'✓':(i+1);
+    const lc=st!=='wait'?'on':'';
+    const ents=cur.entries.filter(e=>e.phase===p.k&&e.skill!=='phase-transition');
+    let cnt=ents.length;
+    if(p.k==='00_前段'&&cnt===0)cnt=cur.zendan||0;
+    return '<div class="pipe-ph"><div class="ph-dot '+st+'" style="'+(st==='done'?'background:'+p.c:'')+'">'
+      +icon+'</div><div class="ph-lbl '+lc+'">'+p.l+'</div>'
+      +(cnt?'<div class="ph-cnt">'+cnt+'件</div>':'')+'</div>';
+  }).join('');
+}
+
+function parseInsp(entries){
+  let p=0,w=0,f=0;
+  entries.forEach(e=>{let m;
+    if(m=e.inspection.match(/✅(\d+)/))p+=parseInt(m[1]);
+    if(m=e.inspection.match(/🟡(\d+)/))w+=parseInt(m[1]);
+    if(m=e.inspection.match(/❌(\d+)/))f+=parseInt(m[1]);
+  });
+  return{pass:p,warn:w,fail:f,total:p+w+f};
+}
+
+function rMetrics(){
+  const ents=cur.entries.filter(e=>e.skill!=='phase-transition');
+  const ins=parseInsp(ents);
+  const score=ins.total?Math.round(ins.pass/ins.total*100):0;
+  const openI=cur.issues.filter(i=>i.status!=='完了').length;
+  const hiI=cur.issues.filter(i=>i.priority==='高'&&i.status!=='完了').length;
+  const actR=cur.risks.filter(r=>r.status==='監視中').length;
+  const colors=['var(--primary)','var(--warn)','#7c3aed','var(--success)'];
+  const cards=[
+    {l:'成果物',v:ents.length+(cur.zendan||0),s:new Set(ents.map(e=>e.phase)).size+'フェーズ通過',cl:colors[0],bl:colors[0]},
+    {l:'課題',v:openI,s:hiI?'高優先 '+hiI+'件':'オープン '+openI+'件',cl:hiI?'var(--danger)':'var(--text)',bl:hiI?'var(--danger)':colors[1]},
+    {l:'リスク',v:cur.risks.length,s:'監視中 '+actR+'件',cl:colors[2],bl:colors[2]},
+    {l:'検査スコア',v:score+'%',s:'✅'+ins.pass+' 🟡'+ins.warn+' ❌'+ins.fail,cl:score>=90?'var(--success)':score>=70?'var(--warn)':'var(--danger)',bl:score>=90?'var(--success)':score>=70?'var(--warn)':'var(--danger)'}
+  ];
+  document.getElementById('mCards').innerHTML=cards.map(c=>
+    '<div class="mc" style="border-left-color:'+c.bl+'"><div class="mc-lbl">'+c.l+'</div><div class="mc-val" style="color:'+c.cl+'">'+c.v+'</div><div class="mc-sub">'+c.s+'</div></div>'
+  ).join('');
+}
+
+function rCharts(){
+  const phData=PH.map(p=>{
+    let n=cur.entries.filter(e=>e.phase===p.k&&e.skill!=='phase-transition').length;
+    if(p.k==='00_前段'&&n===0)n=cur.zendan||0;
+    return{l:p.l,n,c:p.c};
+  });
+  if(chP)chP.destroy();
+  chP=new Chart(document.getElementById('cPhase'),{
+    type:'bar',
+    data:{labels:phData.map(d=>d.l),datasets:[{data:phData.map(d=>d.n),backgroundColor:phData.map(d=>d.c),borderRadius:6,barThickness:28}]},
+    options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',
+      plugins:{legend:{display:false}},
+      scales:{x:{beginAtZero:true,ticks:{stepSize:1},grid:{display:false}},y:{grid:{display:false}}}}
+  });
+  const ins=parseInsp(cur.entries.filter(e=>e.skill!=='phase-transition'));
+  if(chI)chI.destroy();
+  chI=new Chart(document.getElementById('cInsp'),{
+    type:'doughnut',
+    data:{labels:['合格 (✅)','要確認 (🟡)','不合格 (❌)'],
+      datasets:[{data:[ins.pass,ins.warn,ins.fail],backgroundColor:['#059669','#d97706','#dc2626'],borderWidth:0}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'62%',
+      plugins:{legend:{position:'bottom',labels:{font:{size:11},padding:10}}}}
+  });
+}
+
+function rIssues(){
+  const is=cur.issues;
+  if(!is.length){document.getElementById('tIssue').innerHTML='<div class="empty">課題管理表なし（実行フェーズ以降で生成）</div>';return}
+  const pb=p=>p==='高'?'<span class="badge b-hi">高</span>':p==='中'?'<span class="badge b-md">中</span>':'<span class="badge b-lo">低</span>';
+  const sb=s=>s==='完了'?'<span class="badge b-done">完了</span>':s==='対応中'?'<span class="badge b-act">対応中</span>':'<span class="badge b-open">オープン</span>';
+  document.getElementById('tIssue').innerHTML='<table><thead><tr><th>ID</th><th>課題</th><th>優先度</th><th>状態</th><th>担当</th><th>期限</th></tr></thead><tbody>'
+    +is.map(i=>'<tr><td><strong>'+i.id+'</strong></td><td>'+i.title+'</td><td>'+pb(i.priority)+'</td><td>'+sb(i.status)+'</td><td>'+i.assignee+'</td><td>'+i.deadline+'</td></tr>').join('')
+    +'</tbody></table>';
+}
+
+function rRisks(){
+  const rs=cur.risks;
+  if(!rs.length){document.getElementById('tRisk').innerHTML='<div class="empty">リスク登録簿なし（計画フェーズ以降で生成）</div>';return}
+  const ib=v=>{
+    if(v==='致命的'||v==='最高')return'<span class="badge b-hi">'+v+'</span>';
+    if(v==='高')return'<span class="badge b-hi">'+v+'</span>';
+    if(v==='中')return'<span class="badge b-md">'+v+'</span>';
+    return'<span class="badge b-lo">'+v+'</span>';};
+  const stb=s=>s==='監視中'?'<span class="badge b-watch">監視中</span>':s==='未発生'?'<span class="badge b-lo">未発生</span>':'<span class="badge b-done">'+s+'</span>';
+  document.getElementById('tRisk').innerHTML='<table><thead><tr><th>ID</th><th>リスク</th><th>区分</th><th>確率</th><th>影響</th><th>対応</th><th>状態</th></tr></thead><tbody>'
+    +rs.map(r=>'<tr><td><strong>'+r.id+'</strong></td><td>'+r.name+'</td><td>'+r.cat+'</td><td>'+ib(r.prob)+'</td><td>'+ib(r.impact)+'</td><td>'+r.strategy+'</td><td>'+stb(r.status)+'</td></tr>').join('')
+    +'</tbody></table>';
+}
+
+async function rHealth(){
+  const el=document.getElementById('hTxt');
+  if(!window.cowork?.askClaude){
+    el.textContent='全フェーズ完走、検査全項目合格。課題8件（高3件）・リスク7件（監視5件）は実行開始時の初期状態。';
+    el.className='health-txt';return;
+  }
+  try{
+    const ents=cur.entries.filter(e=>e.skill!=='phase-transition');
+    const ins=parseInsp(ents);
+    const d={name:cur.name,phase:cur.phase,deliverables:ents.length+(cur.zendan||0),
+      issues_open:cur.issues.filter(i=>i.status!=='完了').length,
+      issues_high:cur.issues.filter(i=>i.priority==='高'&&i.status!=='完了').length,
+      risks_active:cur.risks.filter(r=>r.status==='監視中').length,
+      risks_total:cur.risks.length,inspection:ins};
+    const res=await window.cowork.askClaude(
+      'このプロジェクトの状況を日本語で2〜3文で簡潔に評価してください。良い点と注意点を含めてください。',
+      [JSON.stringify(d)]);
+    const txt=res?.content?.[0]?.text||(typeof res==='string'?res:'');
+    el.textContent=txt||'評価を取得できませんでした。';
+    el.className='health-txt';
+  }catch(e){
+    el.textContent='全フェーズ完走、検査全項目合格。課題8件（高3件）・リスク7件（監視5件）は実行開始時の初期状態。';
+    el.className='health-txt';
+  }
+}
+
+init();
+</script>
+</body>
+</html>

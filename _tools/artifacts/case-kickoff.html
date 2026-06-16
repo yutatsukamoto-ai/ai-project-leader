@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>案件キックオフ</title>
+<style>
+:root{color-scheme:light;--bg:#f8fafc;--card:#fff;--text:#0f172a;--text2:#64748b;--text3:#94a3b8;--border:#e2e8f0;--primary:#2563eb;--primary-l:#eff6ff;--success:#059669;--success-l:#f0fdf4;--warn:#d97706;--warn-l:#fffbeb;--radius:14px;--shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.03)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+.ctr{max-width:640px;margin:0 auto;padding:20px}
+.hdr{text-align:center;margin-bottom:24px}
+.hdr h1{font-size:20px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px}
+.hdr p{font-size:13px;color:var(--text2);margin-top:4px}
+
+/* Stepper */
+.stepper{display:flex;justify-content:center;gap:0;margin-bottom:28px;position:relative}
+.step-item{display:flex;flex-direction:column;align-items:center;position:relative;flex:1;max-width:120px}
+.step-item:not(:last-child)::after{content:'';position:absolute;top:14px;left:calc(50% + 18px);width:calc(100% - 36px);height:2px;background:var(--border);z-index:0}
+.step-item.done:not(:last-child)::after{background:var(--success)}
+.step-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;background:var(--border);color:var(--text2);z-index:1;transition:all .3s}
+.step-item.active .step-dot{background:var(--primary);color:#fff;box-shadow:0 0 0 4px rgba(37,99,235,.15)}
+.step-item.done .step-dot{background:var(--success);color:#fff}
+.step-lbl{font-size:10px;color:var(--text3);margin-top:4px;font-weight:500;text-align:center}
+.step-item.active .step-lbl{color:var(--primary);font-weight:700}
+.step-item.done .step-lbl{color:var(--success)}
+
+/* Card */
+.card{background:var(--card);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);margin-bottom:16px}
+.card-title{font-size:15px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:6px}
+.card-desc{font-size:12px;color:var(--text2);margin:-8px 0 16px;line-height:1.5}
+
+/* Form */
+.field{margin-bottom:16px}
+.field:last-child{margin-bottom:0}
+label{display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:5px}
+label .req{color:#dc2626;margin-left:2px}
+input,textarea,select{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;background:var(--card);color:var(--text);transition:border .2s}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+textarea{resize:vertical;min-height:80px}
+select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.hint{font-size:11px;color:var(--text3);margin-top:3px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.chip{padding:5px 12px;border:1.5px solid var(--border);border-radius:99px;font-size:12px;cursor:pointer;transition:all .2s;background:var(--card);user-select:none}
+.chip:hover{border-color:var(--primary);background:var(--primary-l)}
+.chip.sel{border-color:var(--primary);background:var(--primary);color:#fff}
+
+/* Buttons */
+.btns{display:flex;gap:10px;justify-content:space-between;margin-top:20px}
+.btn{padding:10px 24px;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;font-family:inherit}
+.btn-pri{background:var(--primary);color:#fff;flex:1}.btn-pri:hover{background:#1d4ed8}
+.btn-sec{background:var(--card);color:var(--text2);border:1.5px solid var(--border)}.btn-sec:hover{background:var(--bg)}
+.btn-go{background:var(--success);color:#fff;flex:1;font-size:15px;padding:12px 24px}.btn-go:hover{background:#047857}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* Review */
+.review-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+.review-row:last-child{border-bottom:none}
+.review-lbl{color:var(--text2);font-weight:500}
+.review-val{font-weight:600;text-align:right;max-width:60%}
+.deliverables{margin-top:12px}
+.dlv{display:flex;align-items:center;gap:6px;padding:4px 0;font-size:12px}
+.dlv-req{color:var(--primary);font-weight:600}
+.dlv-rec{color:var(--warn);font-weight:600}
+.dlv-opt{color:var(--text3);font-weight:500}
+
+/* Done */
+.done-card{text-align:center;padding:32px 24px}
+.done-icon{font-size:48px;margin-bottom:12px}
+.done-msg{font-size:16px;font-weight:700;margin-bottom:6px}
+.done-sub{font-size:13px;color:var(--text2);margin-bottom:20px;line-height:1.6}
+
+/* hidden */
+.hidden{display:none}
+</style>
+</head>
+<body>
+<div class="ctr">
+  <div class="hdr">
+    <h1>🚀 案件キックオフ</h1>
+    <p>案件情報を入力して前段チェーンを開始</p>
+  </div>
+
+  <div class="stepper" id="stepper"></div>
+
+  <!-- Step 1: 基本情報 -->
+  <div class="card step-card" id="s1">
+    <div class="card-title">📋 基本情報</div>
+    <div class="card-desc">クライアントと案件の概要を入力してください</div>
+    <div class="field">
+      <label>クライアント名<span class="req">*</span></label>
+      <input id="f_client" placeholder="例: 株式会社丸山製作所">
+    </div>
+    <div class="field">
+      <label>業種</label>
+      <div class="chips" id="c_industry">
+        <div class="chip" data-v="製造業">製造業</div>
+        <div class="chip" data-v="小売・流通">小売・流通</div>
+        <div class="chip" data-v="金融・保険">金融・保険</div>
+        <div class="chip" data-v="IT・通信">IT・通信</div>
+        <div class="chip" data-v="建設・不動産">建設・不動産</div>
+        <div class="chip" data-v="医療・福祉">医療・福祉</div>
+        <div class="chip" data-v="サービス業">サービス業</div>
+      </div>
+      <input id="f_industry_other" placeholder="その他（自由記述）" style="margin-top:8px">
+    </div>
+    <div class="field">
+      <label>従業員規模</label>
+      <select id="f_size">
+        <option value="">選択してください</option>
+        <option>〜50名（小規模）</option>
+        <option>50〜300名（中規模）</option>
+        <option>300〜1000名（中堅）</option>
+        <option>1000名〜（大企業）</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>予算感</label>
+      <select id="f_budget">
+        <option value="">選択してください</option>
+        <option>〜500万円</option>
+        <option>500〜1500万円</option>
+        <option>1500〜5000万円</option>
+        <option>5000万円〜</option>
+        <option>未定・未聴取</option>
+      </select>
+    </div>
+    <div class="btns">
+      <div></div>
+      <button class="btn btn-pri" onclick="next(1)">次へ →</button>
+    </div>
+  </div>
+
+  <!-- Step 2: 案件内容 -->
+  <div class="card step-card hidden" id="s2">
+    <div class="card-title">💬 案件内容</div>
+    <div class="card-desc">商談やヒアリングで聞いた内容を自由に入力してください。箇条書き・話し言葉OK</div>
+    <div class="field">
+      <label>案件の説明・相談内容<span class="req">*</span></label>
+      <textarea id="f_desc" rows="6" placeholder="例: 受注〜出荷のプロセスが属人化していて、ベテラン社員の退職を控えて業務の可視化と標準化をしたい。現場はIT化に消極的で..."></textarea>
+      <div class="hint">初回商談のメモ、議事録のコピペ、箇条書きなど何でもOK</div>
+    </div>
+    <div class="field">
+      <label>先方のキーパーソン</label>
+      <textarea id="f_people" rows="2" placeholder="例: 大西取締役（スポンサー）、小林課長（現場窓口）、村上工場長（影響力大・懐疑的）"></textarea>
+    </div>
+    <div class="field">
+      <label>先方が口にした「期待」や「不安」</label>
+      <textarea id="f_expect" rows="3" placeholder="例: 「AIで在庫を最適化したい」「現場がついてこないのは困る」「社長が急にDXと言い出した」"></textarea>
+      <div class="hint">手段（AI・ツール名）と目的を区別するヒントになります</div>
+    </div>
+    <div class="btns">
+      <button class="btn btn-sec" onclick="prev(2)">← 戻る</button>
+      <button class="btn btn-pri" onclick="next(2)">次へ →</button>
+    </div>
+  </div>
+
+  <!-- Step 3: テーラリング -->
+  <div class="card step-card hidden" id="s3">
+    <div class="card-title">⚙️ テーラリング判断</div>
+    <div class="card-desc">この案件の特徴に合わせて成果物の厚みを調整します（後から変更OK）</div>
+    <div class="field">
+      <label>案件タイプ</label>
+      <div class="chips" id="c_type">
+        <div class="chip" data-v="業務改善">業務改善</div>
+        <div class="chip" data-v="DX推進">DX推進</div>
+        <div class="chip" data-v="AI/PoC">AI/PoC</div>
+        <div class="chip" data-v="システム導入">システム導入</div>
+        <div class="chip" data-v="組織変革">組織変革</div>
+      </div>
+    </div>
+    <div class="field">
+      <label>定着リスク（現場の抵抗感）</label>
+      <div class="chips" id="c_adoption">
+        <div class="chip" data-v="低い（協力的）">低い</div>
+        <div class="chip" data-v="中程度">中程度</div>
+        <div class="chip" data-v="高い（抵抗あり）">高い</div>
+      </div>
+    </div>
+    <div class="field">
+      <label>スコープの安定性</label>
+      <div class="chips" id="c_scope">
+        <div class="chip" data-v="安定（明確）">安定</div>
+        <div class="chip" data-v="やや不安定">やや不安定</div>
+        <div class="chip" data-v="不安定（探索的）">不安定</div>
+      </div>
+    </div>
+    <div class="field">
+      <label>特記事項・制約</label>
+      <textarea id="f_notes" rows="2" placeholder="例: ISO改訂が控えている、基幹システムの保守切れが近い、社長案件で急ぎ"></textarea>
+    </div>
+    <div class="btns">
+      <button class="btn btn-sec" onclick="prev(3)">← 戻る</button>
+      <button class="btn btn-pri" onclick="next(3)">確認へ →</button>
+    </div>
+  </div>
+
+  <!-- Step 4: 確認 -->
+  <div class="card step-card hidden" id="s4">
+    <div class="card-title">✅ 確認</div>
+    <div class="card-desc">以下の内容で前段チェーンを開始します</div>
+    <div id="reviewBody"></div>
+    <div class="btns">
+      <button class="btn btn-sec" onclick="prev(4)">← 修正する</button>
+      <button class="btn btn-go" onclick="launch()">🚀 前段チェーン開始</button>
+    </div>
+  </div>
+
+  <!-- Step 5: 完了 -->
+  <div class="card step-card hidden" id="s5">
+    <div class="done-card">
+      <div class="done-icon">🎯</div>
+      <div class="done-msg">前段チェーンを起動しました</div>
+      <div class="done-sub">チャットに案件情報が送信されました。<br>Claudeが案件理解サマリー（0-1）の作成を開始します。<br>チャット画面に切り替えてください。</div>
+      <button class="btn btn-pri" onclick="reset()">別の案件を入力</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const STEPS=[
+  {id:'s1',label:'基本情報'},
+  {id:'s2',label:'案件内容'},
+  {id:'s3',label:'テーラリング'},
+  {id:'s4',label:'確認'},
+  {id:'s5',label:'開始'}
+];
+let cur=0;
+const chips={};
+
+function initStepper(){
+  const el=document.getElementById('stepper');
+  el.innerHTML=STEPS.map((s,i)=>{
+    const cls=i===0?'active':''
+    return`<div class="step-item ${cls}" id="si${i}"><div class="step-dot">${i+1}</div><div class="step-lbl">${s.label}</div></div>`
+  }).join('');
+}
+
+function updateStepper(){
+  STEPS.forEach((_,i)=>{
+    const el=document.getElementById('si'+i);
+    el.className='step-item'+(i<cur?' done':'')+(i===cur?' active':'');
+    el.querySelector('.step-dot').textContent=i<cur?'✓':(i+1);
+  });
+}
+
+function showStep(n){
+  STEPS.forEach((s,i)=>document.getElementById(s.id).classList.toggle('hidden',i!==n));
+  cur=n;updateStepper();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function next(from){
+  if(from===1){
+    if(!document.getElementById('f_client').value.trim()){
+      document.getElementById('f_client').style.borderColor='#dc2626';
+      document.getElementById('f_client').focus();return;
+    }
+    document.getElementById('f_client').style.borderColor='';
+  }
+  if(from===2){
+    if(!document.getElementById('f_desc').value.trim()){
+      document.getElementById('f_desc').style.borderColor='#dc2626';
+      document.getElementById('f_desc').focus();return;
+    }
+    document.getElementById('f_desc').style.borderColor='';
+  }
+  if(from===3)buildReview();
+  showStep(from);
+}
+
+function prev(to){showStep(to-2)}
+
+function getChip(id){return chips[id]||''}
+function getVal(id){return document.getElementById(id)?.value?.trim()||''}
+
+function buildReview(){
+  const industry=getChip('c_industry')||getVal('f_industry_other')||'未入力';
+  const rows=[
+    ['クライアント',getVal('f_client')],
+    ['業種',industry],
+    ['規模',getVal('f_size')||'未入力'],
+    ['予算感',getVal('f_budget')||'未入力'],
+    ['案件タイプ',getChip('c_type')||'未入力'],
+    ['定着リスク',getChip('c_adoption')||'未入力'],
+    ['スコープ安定性',getChip('c_scope')||'未入力']
+  ];
+  const desc=getVal('f_desc');
+  const people=getVal('f_people');
+  const expect=getVal('f_expect');
+  const notes=getVal('f_notes');
+
+  let html=rows.map(r=>`<div class="review-row"><span class="review-lbl">${r[0]}</span><span class="review-val">${r[1]}</span></div>`).join('');
+  if(desc)html+=`<div class="review-row"><span class="review-lbl">案件説明</span><span class="review-val" style="text-align:left;max-width:100%;margin-top:4px;white-space:pre-wrap;font-weight:400">${desc.substring(0,120)}${desc.length>120?'…':''}</span></div>`;
+
+  // 成果物チェックリスト
+  html+=`<div class="deliverables"><div style="font-size:12px;font-weight:700;margin:12px 0 6px;color:var(--text2)">この案件で作成する成果物（見込み）</div>`;
+  const must=[
+    '案件理解サマリー（0-1）','課題仮説シート（0-2）','計画提案書（0-4）',
+    'チャーター','統合計画書','課題管理表','状況報告','終結報告書'
+  ];
+  const rec=[];
+  const opt=[];
+
+  // テーラリング判断
+  const adoption=getChip('c_adoption');
+  const scope=getChip('c_scope');
+  const ctype=getChip('c_type');
+  const budget=getVal('f_budget');
+
+  rec.push('リサーチメモ（0-3）');
+  rec.push('ステークホルダー登録簿');
+  rec.push('WBS');
+  if(scope&&scope.includes('不安定'))rec.push('変更管理表');
+  else opt.push('変更管理表');
+
+  if(adoption&&adoption.includes('高い')){rec.push('コミュニケーション計画');rec.push('ステークホルダー登録簿');}
+  if(ctype==='AI/PoC')rec.push('PoC提案書');
+  if(budget&&(budget.includes('1500')||budget.includes('5000')))opt.push('コスト管理計画');
+
+  must.forEach(m=>html+=`<div class="dlv"><span class="dlv-req">必須</span>${m}</div>`);
+  [...new Set(rec)].forEach(r=>html+=`<div class="dlv"><span class="dlv-rec">推奨</span>${r}</div>`);
+  opt.forEach(o=>html+=`<div class="dlv"><span class="dlv-opt">任意</span>${o}</div>`);
+  html+=`<div style="font-size:11px;color:var(--text3);margin-top:6px">※ 前段チェーン中にテーラリング判断で調整されます</div></div>`;
+
+  document.getElementById('reviewBody').innerHTML=html;
+}
+
+function launch(){
+  const d={
+    client:getVal('f_client'),
+    industry:getChip('c_industry')||getVal('f_industry_other'),
+    size:getVal('f_size'),
+    budget:getVal('f_budget'),
+    desc:getVal('f_desc'),
+    people:getVal('f_people'),
+    expect:getVal('f_expect'),
+    type:getChip('c_type'),
+    adoption:getChip('c_adoption'),
+    scope:getChip('c_scope'),
+    notes:getVal('f_notes')
+  };
+
+  let prompt='前段チェーンを開始してください。以下が案件情報です。\n\n';
+  prompt+=`【クライアント】${d.client}\n`;
+  if(d.industry)prompt+=`【業種】${d.industry}\n`;
+  if(d.size)prompt+=`【規模】${d.size}\n`;
+  if(d.budget)prompt+=`【予算感】${d.budget}\n`;
+  if(d.type)prompt+=`【案件タイプ】${d.type}\n`;
+  if(d.adoption)prompt+=`【定着リスク】${d.adoption}\n`;
+  if(d.scope)prompt+=`【スコープ安定性】${d.scope}\n`;
+  prompt+=`\n【案件説明】\n${d.desc}\n`;
+  if(d.people)prompt+=`\n【キーパーソン】\n${d.people}\n`;
+  if(d.expect)prompt+=`\n【先方の期待・不安】\n${d.expect}\n`;
+  if(d.notes)prompt+=`\n【特記事項・制約】\n${d.notes}\n`;
+
+  if(window.cowork?.sendPrompt){
+    window.cowork.sendPrompt(prompt);
+  } else if(window.sendPrompt){
+    window.sendPrompt(prompt);
+  } else {
+    // Fallback: copy to clipboard
+    navigator.clipboard?.writeText(prompt);
+  }
+  showStep(4);
+}
+
+function reset(){
+  document.querySelectorAll('input,textarea').forEach(el=>el.value='');
+  document.querySelectorAll('select').forEach(el=>el.selectedIndex=0);
+  document.querySelectorAll('.chip.sel').forEach(el=>el.classList.remove('sel'));
+  Object.keys(chips).forEach(k=>delete chips[k]);
+  showStep(0);
+}
+
+// Chip selection
+document.addEventListener('click',e=>{
+  const chip=e.target.closest('.chip');
+  if(!chip)return;
+  const group=chip.parentElement.id;
+  chip.parentElement.querySelectorAll('.chip').forEach(c=>c.classList.remove('sel'));
+  chip.classList.add('sel');
+  chips[group]=chip.dataset.v;
+});
+
+initStepper();
+</script>
+</body>
+</html>
