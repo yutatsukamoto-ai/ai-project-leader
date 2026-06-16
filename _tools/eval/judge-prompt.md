@@ -8,7 +8,10 @@
 
 ## 使い方
 
-1ゴールデン（成果物md）ごとに、下のプロンプトに「対象Skill名」「ゴールデン本文」を差し込んで判定者に渡す。
+**自動生成（推奨）**: `bash _tools/eval-judge.sh` で全ゴールデンのjudgeプロンプトを `_tools/eval/judge-results/` に一括生成。1件だけ回すなら `bash _tools/eval-judge.sh --prompt <skill> <case>` で標準出力に出せる。
+
+**手動**: 1ゴールデン（成果物md）ごとに、下のプロンプトに「対象Skill名」「ゴールデン本文」を差し込んで判定者に渡す。
+
 判定者は共通チェック＋該当Skill固有チェックを順に見て、各項目 `pass`／`fail`／`n/a` と一文の根拠を返す。
 `fail` が1つでもあれば、そのゴールデンは目視層FAIL。原因が「Skill劣化」か「仕様変更（ゴールデン更新すべき）」かを人が切り分ける（M-09）。
 
@@ -57,4 +60,5 @@
 
 - 機械層（eval.sh＝型）が緑でも、judgeで質のfailが出ることがある。これが急所2（型は通るが中身が劣化）への網。
 - judgeの判定はモデル依存。判定者には**回す本番より強いモデル**を割り当てるのが望ましい（覚書§5の使い分け）。
-- Claude Code版: 本書を subagent の指示文に流用し、`eval.sh` のPASS後に各ゴールデンへ judge を回して結果を `eval/judge-log.md` 等に追記する想定（覚書§3）。
+- Cowork版: `eval-judge.sh` でプロンプト生成→Claude（同会話 or 別会話）に渡して判定→結果は `eval/judge-results/` に保存。
+- Claude Code版: `eval-judge.sh --prompt <skill> <case>` を subagent に渡して自動実行→結果を `eval/judge-results/` に追記（覚書§3）。

@@ -46,7 +46,7 @@ echo "--------------------------------"
 echo "ゴールデン ${total}件: PASS ${pass} / FAIL ${fail}"
 if [[ $fail -eq 0 ]]; then
   echo "✅ eval: 回帰なし（型は維持されている）"
-  echo "※ 目視層は _tools/eval/合格チェックリスト.md を確認（機械では見ない品質バー）"
+  echo "※ 目視層: bash _tools/eval-judge.sh でLLM-judgeプロンプトを自動生成"
   exit 0
 else
   echo "⚠️  eval: ${fail}件のゴールデンで型が崩れている（上記）"

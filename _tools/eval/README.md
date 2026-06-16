@@ -8,10 +8,11 @@ LLM出力は値の厳密一致ができないので、**ゴールデン案件＋
 | 層 | 何を見る | 実行 | 判定 |
 |---|---|---|---|
 | 機械層 | 各ゴールデンに「節の核トークン」が在るか・ファイルが在るか | `bash _tools/eval.sh`（全件）／`bash _tools/eval.sh <skill>`（個別） | 自動（0=全PASS） |
-| 目視層 | 読まないと分からない品質バー（状態は言葉/数字ぼかさない/下流と矛盾しない 等） | `eval/合格チェックリスト.md`（基準）＋`eval/judge-prompt.md`（LLM判定者で回す形）。初回基準値=`eval/baseline_2026-06-14.md` | 人・LLM-judge |
+| 目視層 | 読まないと分からない品質バー（状態は言葉/数字ぼかさない/下流と矛盾しない 等） | `bash _tools/eval-judge.sh`（プロンプト自動生成）。基準=`eval/合格チェックリスト.md`、プロンプト雛形=`eval/judge-prompt.md`、初回基準値=`eval/baseline_2026-06-14.md` | LLM-judge（自動生成プロンプト→Claude判定） |
 
 - 機械層の入力＝`eval/goldens.tsv`（skill・case・パス・必須トークン）。トークンは見出しの厳密一致でなく”言い回しが変わっても残るべき核”。
-- 現在のゴールデン＝山藤11件＋テクノブリッジ11件＋丸山15件の計37件（2026-06-16時点）。カバーSkill: 15種。
+- 現在のゴールデン＝山藤12件＋テクノブリッジ10件＋スマートファクトリー1件＋丸山15件の計38件（2026-06-16時点）。カバーSkill: 16種。
+- ゴールデン未カバー（出力が未生成のため）: scope-plan, schedule-plan, cost-plan, resource-plan, communication-management, resource-management, poc-evaluation の7種。これらはテーラリング依存で実案件出力が生まれた時点でゴールデン追加する。合格チェックリストは全種記載済み。
 
 ## いつ流すか
 
