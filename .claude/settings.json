@@ -1,0 +1,7 @@
+{
+  "_comment": "hooks・permissions は後で設計",
+  "hooks": {},
+  "permissions": {
+    "allowedTools": []
+  }
+}

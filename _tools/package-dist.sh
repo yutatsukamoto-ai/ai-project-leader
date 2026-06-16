@@ -4,6 +4,7 @@
 # 使い方:
 #   bash _tools/package-dist.sh              … _dist/ に配布フォルダを生成
 #   bash _tools/package-dist.sh --dry-run    … 何をコピーするか表示（実行しない）
+#   bash _tools/package-dist.sh --target claude-code
 #
 # 3層モデル準拠:
 #   L1（配布）= 20_Skills + 40_Stock + 10_参考資料のPMBOK再構成 + _tools + README等
@@ -15,7 +16,29 @@ ROOT="$(cd "$HERE/.." && pwd)"
 # Coworkマウントはrm/deleteを拒否するため、/tmpで組み立ててからrsyncでコピーする。
 STAGING="$(mktemp -d)"
 DIST="$ROOT/_dist"
-DRY="${1:-}"
+DRY=""
+TARGET="cowork"
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --dry-run)
+      DRY="--dry-run"
+      shift
+      ;;
+    --target)
+      TARGET="${2:-}"
+      [[ "$TARGET" == "cowork" || "$TARGET" == "claude-code" ]] || {
+        echo "ERROR: --target は cowork または claude-code を指定してください" >&2
+        exit 2
+      }
+      shift 2
+      ;;
+    *)
+      echo "ERROR: unknown option: $1" >&2
+      exit 2
+      ;;
+  esac
+done
 
 trap 'rm -rf "$STAGING"' EXIT
 
@@ -23,19 +46,20 @@ log() { echo "  $1"; }
 
 if [[ "$DRY" == "--dry-run" ]]; then
   echo "=== package-dist: ドライラン（コピーしない）==="
+  echo "target: $TARGET"
   echo ""
 fi
 
 # --- L1: Skills（.skillを除く。受け手がbuild.shで再生成する） ---
 log "L1: 20_Skills/ （ソースのみ、.skill除外）"
 if [[ "$DRY" != "--dry-run" ]]; then
-  rsync -a --exclude='*.skill' "$ROOT/20_Skills/" "$STAGING/20_Skills/"
+  rsync -a --exclude='.DS_Store' --exclude='*.skill' "$ROOT/20_Skills/" "$STAGING/20_Skills/"
 fi
 
 # --- L2: 横断ガイドライン・カード・テンプレート・ナレッジ・案件教訓 ---
 log "L2: 40_Stock/"
 if [[ "$DRY" != "--dry-run" ]]; then
-  rsync -a "$ROOT/40_Stock/" "$STAGING/40_Stock/"
+  rsync -a --exclude='.DS_Store' "$ROOT/40_Stock/" "$STAGING/40_Stock/"
 fi
 
 # --- L2: PMBOK再構成テキスト（著作物ではない） ---
@@ -73,7 +97,7 @@ fi
 # --- 横断Skill（slide-craft等） ---
 log "L1: 90_横断/"
 if [[ "$DRY" != "--dry-run" ]]; then
-  rsync -a --exclude='*.skill' "$ROOT/90_横断/" "$STAGING/90_横断/"
+  rsync -a --exclude='.DS_Store' --exclude='*.skill' "$ROOT/90_横断/" "$STAGING/90_横断/"
 fi
 
 # --- 雛形フォルダ（空） ---
@@ -118,6 +142,22 @@ if [[ "$DRY" != "--dry-run" ]]; then
   cp "$ROOT/README.md" "$STAGING/"
   cp "$ROOT/.gitignore" "$STAGING/"
   cp "$ROOT/プロジェクト骨子.md" "$STAGING/プロジェクト骨子.md"
+fi
+
+if [[ "$TARGET" == "claude-code" ]]; then
+  log "Claude Code: .claude/・CLAUDE.md"
+  if [[ "$DRY" != "--dry-run" ]]; then
+    [[ -f "$ROOT/CLAUDE.md" ]] || { echo "ERROR: CLAUDE.md がありません" >&2; exit 2; }
+    [[ -d "$ROOT/.claude" ]] || { echo "ERROR: .claude/ がありません" >&2; exit 2; }
+    cp "$ROOT/CLAUDE.md" "$STAGING/"
+    rsync -a --exclude='.DS_Store' "$ROOT/.claude/" "$STAGING/.claude/"
+  fi
+fi
+
+# --- macOSメタデータ除外 ---
+log "除外: .DS_Store"
+if [[ "$DRY" != "--dry-run" ]]; then
+  find "$STAGING" -name '.DS_Store' -type f -delete
 fi
 
 # --- 除外確認 ---
@@ -188,7 +228,7 @@ fi
 echo ""
 echo "=== _dist/ に配置 ==="
 mkdir -p "$DIST"
-rsync -a "$STAGING/" "$DIST/"
+rsync -a --delete "$STAGING/" "$DIST/"
 
 # --- 統計 ---
 echo ""

@@ -4,6 +4,7 @@
 #   bash _tools/build.sh --all                … SKILL.mdを持つ全Skillをビルド＋検証
 #   bash _tools/build.sh --verify             … 非破壊：全 .skill の健全性＋ゴミ＋ドリフトを点検（毎日の自動チェック用）
 #   bash _tools/build.sh --sync               … 正典→コピーを反映し、影響する .skill を再パッケージ＋verify
+#   bash _tools/build.sh --sync-cc            … 20_Skills/配下のSkill本体を .claude/skills/ へ同期
 #   bash _tools/build.sh --check              … 正典↔コピーのズレだけ検査（非破壊。verify の一部）
 #   bash _tools/build.sh --release-check      … 配布前ゲート：verify＋追跡禁止パス＋配布TODOを点検
 #   bash _tools/build.sh --trace <案件フォルダ> … chain-trace.jsonを整形表示
@@ -37,6 +38,9 @@ verify() {
 
   echo "=== 成果物マップ↔実構成 ==="
   check_map_consistency "$ROOT" "$ROOT/20_Skills/成果物マップ.md" || problems=$((problems+1))
+
+  echo "=== Claude Code Skill同期 ==="
+  check_claude_code_skill_sync || problems=$((problems+1))
 
   echo "=== Git追跡禁止パス ==="
   check_forbidden_tracked_paths "$ROOT" || problems=$((problems+1))
@@ -86,6 +90,43 @@ do_sync() {
   echo "--- sync 完了 ---"
 }
 
+sync_claude_code_skills() {
+  local cc_skills="$ROOT/.claude/skills"
+  rm -rf "$cc_skills"
+  mkdir -p "$cc_skills"
+
+  local count=0 name
+  while IFS= read -r d; do
+    [[ -z "$d" ]] && continue
+    name="$(basename "$d")"
+    rsync -a --exclude='.DS_Store' "$d/" "$cc_skills/$name/"
+    count=$((count+1))
+  done < <(list_skill_dirs "$ROOT" | sort -u)
+
+  echo "copied Claude Code skills: $count"
+}
+
+check_claude_code_skill_sync() {
+  local cc_skills="$ROOT/.claude/skills"
+  if [[ ! -d "$cc_skills" ]]; then
+    echo "ℹ️  未同期（--sync-cc 未実行）"
+    return 0
+  fi
+
+  local source_count cc_count
+  source_count="$(list_skill_dirs "$ROOT" | wc -l | tr -d ' ')"
+  cc_count="$(find "$cc_skills" -mindepth 2 -maxdepth 2 -type f -name SKILL.md 2>/dev/null | wc -l | tr -d ' ')"
+
+  if [[ "$source_count" == "$cc_count" ]]; then
+    echo "✅ .claude/skills: ${cc_count}/${source_count} 件同期済み"
+    return 0
+  fi
+
+  echo "❌ .claude/skills: ${cc_count}/${source_count} 件で不一致"
+  echo "   bash _tools/build.sh --sync-cc を実行してください"
+  return 1
+}
+
 release_check() {
   local problems=0
   verify || problems=$((problems+1))
@@ -106,6 +147,7 @@ case "$cmd" in
             check_drift "$ROOT" "$MANIFEST" && echo "✅ 全コピーが正典と一致" ;;
   --release-check) release_check ;;
   --sync)   do_sync; echo; verify ;;
+  --sync-cc) sync_claude_code_skills ;;
   --all)    build_all; echo; verify ;;
   --trace)
     trace_arg="${2:-}"
@@ -114,7 +156,7 @@ case "$cmd" in
     show_trace "$trace_dir"
     ;;
   ""|-h|--help)
-    echo "usage: bash _tools/build.sh <skillディレクトリ> | --all | --verify | --sync | --check | --release-check | --trace <案件フォルダ>" >&2
+    echo "usage: bash _tools/build.sh <skillディレクトリ> | --all | --verify | --sync | --sync-cc | --check | --release-check | --trace <案件フォルダ>" >&2
     exit 2 ;;
   *)        build_one "$cmd"; echo; verify ;;
 esac
