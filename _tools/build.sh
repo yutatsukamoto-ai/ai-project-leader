@@ -65,20 +65,23 @@ build_all() {
 # 正典→コピーを反映し、影響する .skill を再パッケージ（旧 sync.sh sync）
 do_sync() {
   [[ -f "$MANIFEST" ]] || { echo "ERROR: マニフェストが無い: $MANIFEST" >&2; exit 2; }
-  local -A skilldirs=()
+  local skilldirs_tmp
+  skilldirs_tmp="$(mktemp)" || { echo "ERROR: 一時ファイルを作れない" >&2; exit 2; }
   local master copy
   while IFS=$'\t' read -r master copy _; do
     [[ -z "${master// }" || "${master:0:1}" == "#" ]] && continue
     local m="$ROOT/$master" c="$ROOT/$copy"
     [[ -f "$m" ]] || { echo "SKIP 正典なし: $master" >&2; continue; }
     mkdir -p "$(dirname "$c")"; cp "$m" "$c"; echo "copied → $copy"
-    [[ "$copy" == 20_Skills/*/references/* ]] && skilldirs["${copy%%/references/*}"]=1
+    [[ "$copy" == 20_Skills/*/references/* ]] && echo "${copy%%/references/*}" >> "$skilldirs_tmp"
   done < "$MANIFEST"
-  for sd in "${!skilldirs[@]}"; do
+  while IFS= read -r sd; do
+    [[ -z "$sd" ]] && continue
     if [[ -f "$ROOT/$sd.skill" ]]; then
       repackage_skill "$ROOT/$sd" && echo "repackaged → $sd.skill"
     fi
-  done
+  done < <(sort -u "$skilldirs_tmp")
+  rm -f "$skilldirs_tmp"
   echo "--- sync 完了 ---"
 }
 
