@@ -5,6 +5,37 @@
 
 ---
 
+## 0. Codex版の現在地
+
+Codex版は、まず **リポジトリ編集・検証・配布生成・slide-craft改善** を安全に進めるための入口として扱う。
+案件チェーン本番運用の主戦場は引き続き Claude Cowork。Codexで案件成果物を作る場合も、停止ポイントと承認ゲートはCowork版と同じ扱いにする。
+
+Codexで今できること:
+
+- Skill本文・references・横断ガイドラインの編集
+- `slide-craft` の構成案作成、レビュー、PPTX生成補助
+- `build.sh --verify` / `--check` / `eval.sh` による検証
+- `package-dist.sh --target codex` によるCodex配布フォルダ生成
+- GitHub反映前の差分確認、危険物混入確認、コミット・push
+
+Codexでまだ本格運用しないこと:
+
+- 承認なしのフェーズ移行
+- 実案件データを含む成果物の配布物化
+- Hooks/CI/LLM-judge自動化を前提にした無人運用
+- `.codex/` 専用設定の追加（必要になった時点で設計する）
+
+Codex配布版を作るとき:
+
+```bash
+bash _tools/package-dist.sh --target codex
+bash _tools/test-dist-codex.sh
+```
+
+配布版には `AGENTS.md` と `CODEX.md` を含める。`CLAUDE.md` と `.claude/` はClaude Code専用なので含めない。
+
+---
+
 ## 1. 正典の優先順位
 
 矛盾が見つかったら上位を信じる。下位を勝手に正にしない。
@@ -70,8 +101,31 @@ Skill内容を変えた場合は該当範囲の eval も流す：
 bash _tools/eval.sh
 ```
 
+配布まわりを変えた場合は対象ターゲットのスモークテストも流す：
+
+```bash
+bash _tools/package-dist.sh --target codex
+bash _tools/test-dist-codex.sh
+```
+
+Claude Code配布に影響する変更なら、既存ターゲットも壊していないか確認する：
+
+```bash
+bash _tools/package-dist.sh --target claude-code
+bash _tools/test-dist-cc.sh
+```
+
+GitHubへ反映する前は、少なくとも次を確認する：
+
+```bash
+rg -n '^_dist/$|^_backups/$' .gitignore
+git ls-files _dist _backups
+git status --short --branch
+```
+
 ## 7. やりがちなミスの予防
 
 - **参照元を読まずに書く** → 変更対象のファイルと、それを参照している側の両方を読んでから修正する
 - **1箇所だけ直す** → 正典を直したら `build.sh --check` でコピー側のドリフトを確認する
 - **README.md と AGENTS.md の片方だけ直す** → 両方に同じ情報がある項目（やらないこと、起動文）は両方更新する
+- **Codex版とClaude Code版を混ぜる** → Codex配布は `AGENTS.md` / `CODEX.md`、Claude Code配布は `CLAUDE.md` / `.claude/` と分ける

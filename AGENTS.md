@@ -16,8 +16,9 @@ Claude Cowork / Claude Code / Codex 向けSkill群とナレッジ基盤。
 ## 現在の前提
 
 - 現在の主戦場は Claude Cowork。まず中身・骨組み・配布用Skillを締める。
-- Claude Code / Codex 対応、Hooks、CI、LLM-judge自動化は後続フェーズの宿題。
-- ただし、Codexが後で安全に触れるための入口・規約・検証コマンドは今から守る。
+- Claude Code / Codex 対応は段階導入。Hooks、CI、LLM-judge自動化は後続フェーズの宿題。
+- Codex版は現時点では、リポジトリ編集・検証・配布生成・`slide-craft` 改善の入口として使う。
+- Codex配布版は `bash _tools/package-dist.sh --target codex` で作る。配布版には `AGENTS.md` と `CODEX.md` を含め、Claude Code専用の `CLAUDE.md` / `.claude/` は含めない。
 
 ## 作業時の約束
 
@@ -44,6 +45,9 @@ Claude Cowork / Claude Code / Codex 向けSkill群とナレッジ基盤。
 - `この課題仮説をもとにリサーチメモを作って。`
 - `前段成果物をもとに計画提案書にまとめて。`
 - `引き継ぎ書を受けて立ち上げフェーズを回して。`
+- `このメモからスライド構成案を作って。PPTX生成前に一度止めて。`
+- `このスライドをslide-craft観点でレビューして。改善案だけ出して。`
+- `Codex配布版を作って、_distに危険物が混ざっていないか確認して。`
 
 ## パス規約
 
@@ -76,6 +80,8 @@ Claude Cowork / Claude Code / Codex 向けSkill群とナレッジ基盤。
 - 共通項ドリフトだけ確認: `bash _tools/build.sh --check`
 - 成果物の回帰eval: `bash _tools/eval.sh`
 - Skill改訂時、モデル交代時、配布前は `build.sh --verify` と必要範囲の `eval.sh` を流す。
+- Codex配布版: `bash _tools/package-dist.sh --target codex` → `bash _tools/test-dist-codex.sh`
+- Claude Code配布版: `bash _tools/package-dist.sh --target claude-code` → `bash _tools/test-dist-cc.sh`
 
 ## 後続フェーズの宿題
 
