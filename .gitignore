@@ -16,6 +16,7 @@
 
 # --- 生成済みインスタンス（テンプレートから再生成可）---
 _tools/artifacts/project-dashboard.html
+50_サンプル成果物/
 
 # --- ビルド成果物（build.sh で再生成可。ソースの各Skillフォルダは追跡する）---
 *.skill
@@ -27,6 +28,7 @@ _backups/
 
 # --- ゴミ・OS ---
 *.bak
+~$*
 .DS_Store
 .DS_Store?
 .AppleDouble
