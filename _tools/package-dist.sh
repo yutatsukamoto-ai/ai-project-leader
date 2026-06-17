@@ -94,12 +94,6 @@ TSV
   chmod +x "$STAGING/_tools/build.sh" "$STAGING/_tools/eval.sh" "$STAGING/_tools/eval-judge.sh" "$STAGING/_tools/eval-judge-summary.sh" "$STAGING/_tools/sync.sh"
 fi
 
-# --- 横断Skill（slide-craft等） ---
-log "L1: 90_横断/"
-if [[ "$DRY" != "--dry-run" ]]; then
-  rsync -a --exclude='.DS_Store' --exclude='*.skill' "$ROOT/90_横断/" "$STAGING/90_横断/"
-fi
-
 # --- 雛形フォルダ（空） ---
 log "L2: 空フォルダ骨格（00_管理・30_Flow・50_サンプル）"
 if [[ "$DRY" != "--dry-run" ]]; then
