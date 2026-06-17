@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>成果物マップ — AIプロジェクトリーダー</title>
+<style>
+  @page{size:960px 1200px;margin:0}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:#fff;
+    font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;
+    color:#1a1a1a;
+    padding:28px 24px;
+    width:960px;
+  }
+  .hd{margin-bottom:18px}
+  .hd-title{font-size:20px;font-weight:600;margin-bottom:3px}
+  .hd-sub{font-size:12px;color:#888;letter-spacing:.2px}
+
+  table{width:100%;border-collapse:collapse;margin-bottom:14px}
+  th,td{padding:8px 6px;vertical-align:top;border:1px solid #e0e0e0}
+  th{font-size:11px;font-weight:600;text-align:center;white-space:nowrap}
+  .corner{background:#fff;border-color:#e0e0e0}
+  .domain{font-size:11.5px;font-weight:600;color:#444;background:#fafaf8;white-space:nowrap;width:80px}
+
+  .h1{background:#E6F1FB;color:#0C447C}
+  .h2{background:#EEEDFE;color:#3C3489}
+  .h3{background:#FAECE7;color:#712B13}
+  .h4{background:#FAEEDA;color:#633806}
+  .h5{background:#FBEAF0;color:#72243E}
+
+  .p{display:inline-block;white-space:nowrap;padding:3.5px 7px;border-radius:5px;font-size:10.5px;font-weight:500;margin:0 2px 3px 0;vertical-align:top}
+  .f{font-size:8px;padding:1px 3px;border-radius:2.5px;font-family:"SF Mono","Menlo",monospace;font-weight:600;margin-left:3px}
+
+  .c1 .p{background:#E6F1FB;color:#0C447C} .c1 .f{background:#B5D4F4;color:#042C53}
+  .c2 .p{background:#EEEDFE;color:#3C3489} .c2 .f{background:#CECBF6;color:#26215C}
+  .c3 .p{background:#FAECE7;color:#712B13} .c3 .f{background:#F5C4B3;color:#4A1B0C}
+  .c4 .p{background:#FAEEDA;color:#633806} .c4 .f{background:#FAC775;color:#412402}
+  .c5 .p{background:#FBEAF0;color:#72243E} .c5 .f{background:#F4C0D1;color:#4B1528}
+
+  .empty{color:#ddd;font-size:9px;text-align:center}
+
+  .xsep{padding:8px 0 6px;text-align:center;border-top:1px solid #e0e0e0}
+  .xsep span{font-size:9.5px;color:#999;font-weight:600;letter-spacing:.5px;background:#fff;padding:0 10px;position:relative;top:-14px}
+
+  .cross{display:table;width:100%;margin-bottom:10px}
+  .cross-label{display:table-cell;width:80px;vertical-align:top;font-size:11.5px;font-weight:600;color:#444;padding:4px 6px}
+  .cross-items{display:table-cell;vertical-align:top;padding:4px 6px;line-height:2}
+  .cx .p{background:#F1EFE8;color:#444441} .cx .f{background:#D3D1C7;color:#2C2C2A}
+  .e{display:inline-block;white-space:nowrap;padding:3.5px 7px;border-radius:5px;font-size:10px;border:1.5px dashed #ccc;color:#999;font-style:italic;margin:0 2px 3px 0}
+
+  .bt{display:table;width:100%;padding:10px 0 0;font-size:11px;color:#888;border-top:1px solid #e8e8e8}
+  .bt span{display:inline-block;margin-right:16px}
+  .bt b{font-weight:600;color:#1a1a1a}
+</style>
+</head>
+<body>
+
+<div class="hd">
+  <div class="hd-title">AIプロジェクトリーダー — 成果物マップ</div>
+  <div class="hd-sub">PMBOK第8版準拠 ・ テーラリング対応 ・ 各フェーズに適した成果物を自動生成</div>
+</div>
+
+<table>
+<thead>
+<tr>
+  <th class="corner"></th>
+  <th class="h1">立ち上げ</th>
+  <th class="h2">計画</th>
+  <th class="h3">実行</th>
+  <th class="h4">監視</th>
+  <th class="h5">終結</th>
+</tr>
+</thead>
+<tbody>
+
+<tr>
+  <td class="domain">ガバナンス</td>
+  <td class="c1"><span class="p">チャーター<span class="f">docx</span></span></td>
+  <td class="c2"><span class="p">プロジェクト管理計画<span class="f">docx</span></span><span class="p">ソーシング戦略<span class="f">docx</span></span></td>
+  <td class="c3"><span class="p">課題管理表<span class="f">xlsx</span></span></td>
+  <td class="c4"><span class="p">状況報告<span class="f">docx</span></span><span class="p">変更管理表<span class="f">xlsx</span></span></td>
+  <td class="c5"><span class="p">終結報告書<span class="f">docx</span></span></td>
+</tr>
+
+<tr>
+  <td class="domain">スコープ</td>
+  <td></td>
+  <td class="c2"><span class="p">スコープ管理計画<span class="f">docx</span></span><span class="p">要求事項一覧<span class="f">xlsx</span></span><span class="p">スコープ定義書・BL<span class="f">docx</span></span><span class="p">WBS<span class="f">html</span></span></td>
+  <td></td>
+  <td></td>
+  <td></td>
+</tr>
+
+<tr>
+  <td class="domain">スケジュール</td>
+  <td></td>
+  <td class="c2"><span class="p">スケジュール管理計画<span class="f">docx</span></span><span class="p">アクティビティ一覧<span class="f">xlsx</span></span><span class="p">スケジュールBL<span class="f">docx</span></span></td>
+  <td></td>
+  <td></td>
+  <td></td>
+</tr>
+
+<tr>
+  <td class="domain">リソース</td>
+  <td></td>
+  <td class="c2"><span class="p">リソース管理計画<span class="f">docx</span></span><span class="p">リソース要求一覧<span class="f">xlsx</span></span><span class="p">リソース見積もり<span class="f">xlsx</span></span><span class="p">チームチャーター<span class="f">docx</span></span></td>
+  <td class="c3"><span class="p">資源管理<span class="f">xlsx</span></span></td>
+  <td></td>
+  <td></td>
+</tr>
+
+<tr>
+  <td class="domain">ステーク<br>ホルダー</td>
+  <td class="c1"><span class="p">SH登録簿<span class="f">xlsx</span></span></td>
+  <td class="c2"><span class="p">SHエンゲージメント計画<span class="f">docx</span></span><span class="p">コミュニケーション計画<span class="f">docx</span></span></td>
+  <td class="c3"><span class="p">コミュニケーション管理<span class="f">xlsx</span></span></td>
+  <td></td>
+  <td></td>
+</tr>
+
+<tr>
+  <td class="domain">ファイナンス</td>
+  <td></td>
+  <td class="c2"><span class="p">コスト管理計画<span class="f">docx</span></span><span class="p">コスト見積もり<span class="f">xlsx</span></span><span class="p">コストBL<span class="f">xlsx</span></span></td>
+  <td></td>
+  <td></td>
+  <td></td>
+</tr>
+
+<tr>
+  <td class="domain">リスク</td>
+  <td></td>
+  <td class="c2"><span class="p">リスク管理計画<span class="f">docx</span></span><span class="p">リスク登録<span class="f">xlsx</span></span><span class="p">リスク評価<span class="f">docx</span></span></td>
+  <td></td>
+  <td></td>
+  <td></td>
+</tr>
+
+</tbody>
+</table>
+
+<div class="xsep"><span>CROSS-CUTTING TOOLS</span></div>
+
+<div class="cross cx">
+  <div class="cross-label">横断ツール</div>
+  <div class="cross-items">
+    <span class="p">grill-me 壁打ち</span>
+    <span class="p">業務フロー設計<span class="f">pptx</span></span>
+    <span class="p">スライド作成<span class="f">pptx</span></span>
+    <span class="e">etc.</span>
+  </div>
+</div>
+
+<div class="bt">
+  <span><b>27</b> 成果物</span>
+  <span><b>7</b> ドメイン × <b>5</b> フェーズ</span>
+  <span>PMBOK第8版準拠</span>
+  <span>テーラリング対応</span>
+</div>
+
+</body>
+</html>
