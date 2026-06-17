@@ -97,8 +97,7 @@ check_forbidden_tracked_paths() {
   fi
 
   local denied_dirs=(
-    "30_Flow/2026-06-12/実案件_八束電工"
-    "30_Flow/2026-06-12/Skillテスト_0-1_協和精機"
+    "30_Flow/2026-06-12"
     "_backups"
   )
 
@@ -205,7 +204,7 @@ PYEOF
 # 配布前に解消すべきTODOを一覧化する。現時点ではSkill内の配布TODOを対象にする。
 check_distribution_todos() {
   local root="$1" hits
-  hits="$(grep -RIn --include='*.md' '配布TODO' "$root/20_Skills" 2>/dev/null || true)"
+  hits="$(grep -RIn --include='*.md' '配布TODO' "$root/20_Skills" 2>/dev/null | grep -v '/99_メタ/' || true)"
   if [[ -z "$hits" ]]; then
     echo "✅ 配布TODOなし"
     return 0

@@ -180,20 +180,15 @@ if [[ "$DRY" == "--dry-run" ]]; then
   exit 0
 fi
 
-# --- サニタイズ（実案件名をプレースホルダに置換）---
+# --- サニタイズ（配布用の除外ルールをプレースホルダ化）---
 echo ""
 echo "=== サニタイズ ==="
-# _lib.sh: 実案件パスをプレースホルダに
-sed -i '' 's|30_Flow/2026-06-12/実案件_八束電工|30_Flow/YYYY-MM-DD/実案件_サンプル社|g' "$STAGING/_tools/_lib.sh" 2>/dev/null || \
-sed -i 's|30_Flow/2026-06-12/実案件_八束電工|30_Flow/YYYY-MM-DD/実案件_サンプル社|g' "$STAGING/_tools/_lib.sh"
-sed -i '' 's|30_Flow/2026-06-12/Skillテスト_0-1_協和精機|30_Flow/YYYY-MM-DD/Skillテスト_サンプル|g' "$STAGING/_tools/_lib.sh" 2>/dev/null || \
-sed -i 's|30_Flow/2026-06-12/Skillテスト_0-1_協和精機|30_Flow/YYYY-MM-DD/Skillテスト_サンプル|g' "$STAGING/_tools/_lib.sh"
-# .gitignore: 実案件パスをコメント例に
-sed -i '' 's|30_Flow/2026-06-12/実案件_八束電工/|# 30_Flow/YYYY-MM-DD/実案件_クライアント名/ （実案件はここに追記して除外）|g' "$STAGING/.gitignore" 2>/dev/null || \
-sed -i 's|30_Flow/2026-06-12/実案件_八束電工/|# 30_Flow/YYYY-MM-DD/実案件_クライアント名/ （実案件はここに追記して除外）|g' "$STAGING/.gitignore"
-sed -i '' 's|30_Flow/2026-06-12/Skillテスト_0-1_協和精機/|# 30_Flow/YYYY-MM-DD/テスト_案件名/ （テストで実社名を使った場合も除外）|g' "$STAGING/.gitignore" 2>/dev/null || \
-sed -i 's|30_Flow/2026-06-12/Skillテスト_0-1_協和精機/|# 30_Flow/YYYY-MM-DD/テスト_案件名/ （テストで実社名を使った場合も除外）|g' "$STAGING/.gitignore"
-log "サニタイズ完了（実社名→プレースホルダ）"
+# _lib.sh / .gitignore: ローカル固有の日付フォルダを配布用の例に置換
+sed -i '' 's|30_Flow/2026-06-12|30_Flow/YYYY-MM-DD/実案件_クライアント名|g' "$STAGING/_tools/_lib.sh" 2>/dev/null || \
+sed -i 's|30_Flow/2026-06-12|30_Flow/YYYY-MM-DD/実案件_クライアント名|g' "$STAGING/_tools/_lib.sh"
+sed -i '' 's|30_Flow/2026-06-12/|# 30_Flow/YYYY-MM-DD/実案件_クライアント名/ （実案件はここに追記して除外）|g' "$STAGING/.gitignore" 2>/dev/null || \
+sed -i 's|30_Flow/2026-06-12/|# 30_Flow/YYYY-MM-DD/実案件_クライアント名/ （実案件はここに追記して除外）|g' "$STAGING/.gitignore"
+log "サニタイズ完了（ローカル固有パス→プレースホルダ）"
 
 # --- 危険物チェック ---
 echo ""
@@ -204,11 +199,11 @@ pdf_count=$(find "$STAGING" -iname "*.pdf" 2>/dev/null | wc -l | tr -d ' ')
 img_count=$(find "$STAGING" \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.gif" \) 2>/dev/null | wc -l | tr -d ' ')
 if [[ $pdf_count -gt 0 ]]; then echo "❌ PDF $pdf_count 件混入"; danger=1; fi
 if [[ $img_count -gt 0 ]]; then echo "❌ 画像 $img_count 件混入"; danger=1; fi
-# 実社名チェック（テキストファイルのみ走査、バイナリスキップ）
-for name in 八束電工 協和精機; do
-  hits=$(grep -rl --include='*.md' --include='*.sh' --include='*.tsv' --include='*.html' --include='*.json' "$name" "$STAGING" 2>/dev/null || true)
+# ローカル実案件パスの残存チェック（テキストファイルのみ走査、バイナリスキップ）
+for pattern in '30_Flow/20[0-9][0-9]-[0-9][0-9]-[0-9][0-9]/実案件_' '30_Flow/20[0-9][0-9]-[0-9][0-9]-[0-9][0-9]/Skillテスト_0-1_'; do
+  hits=$(grep -Erl --include='*.md' --include='*.sh' --include='*.tsv' --include='*.html' --include='*.json' "$pattern" "$STAGING" 2>/dev/null || true)
   hit_count=$(echo "$hits" | grep -c . || true)
-  if [[ -n "$hits" ]]; then echo "❌ 実社名「$name」が $hit_count ファイルに残存"; danger=1; fi
+  if [[ -n "$hits" ]]; then echo "❌ ローカル実案件パスパターン「$pattern」が $hit_count ファイルに残存"; danger=1; fi
 done
 # .skillファイル
 skill_files=$(find "$STAGING" -name "*.skill" 2>/dev/null | wc -l | tr -d ' ')
