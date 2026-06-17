@@ -80,8 +80,10 @@ if [[ "$DRY" != "--dry-run" ]]; then
   cp "$ROOT/_tools/eval.sh" "$STAGING/_tools/"
   cp "$ROOT/_tools/eval-judge.sh" "$STAGING/_tools/"
   cp "$ROOT/_tools/eval-judge-summary.sh" "$STAGING/_tools/"
+  cp "$ROOT/_tools/package-dist.sh" "$STAGING/_tools/"
   cp "$ROOT/_tools/sync.sh" "$STAGING/_tools/"
   cp "$ROOT/_tools/sync-manifest.tsv" "$STAGING/_tools/"
+  cp "$ROOT/_tools/test-dist-codex.sh" "$STAGING/_tools/"
   # eval定義（ゴールデンは案件データなので除外、定義とチェックリストのみ）
   cp "$ROOT/_tools/eval/合格チェックリスト.md" "$STAGING/_tools/eval/"
   cp "$ROOT/_tools/eval/judge-prompt.md" "$STAGING/_tools/eval/"
@@ -92,7 +94,7 @@ if [[ "$DRY" != "--dry-run" ]]; then
 # 自分の案件を回したら、出力ファイルのパスと核トークンを追記する。
 # eval.sh がこのファイルを読んで回帰テストを実行する。
 TSV
-  chmod +x "$STAGING/_tools/build.sh" "$STAGING/_tools/eval.sh" "$STAGING/_tools/eval-judge.sh" "$STAGING/_tools/eval-judge-summary.sh" "$STAGING/_tools/sync.sh"
+  chmod +x "$STAGING/_tools/build.sh" "$STAGING/_tools/eval.sh" "$STAGING/_tools/eval-judge.sh" "$STAGING/_tools/eval-judge-summary.sh" "$STAGING/_tools/package-dist.sh" "$STAGING/_tools/sync.sh" "$STAGING/_tools/test-dist-codex.sh"
 fi
 
 # --- 雛形フォルダ（空） ---
@@ -128,6 +130,7 @@ if [[ "$DRY" != "--dry-run" ]]; then
   mkdir -p "$STAGING/_tools/artifacts"
   cp "$ROOT/_tools/artifacts/case-kickoff.html" "$STAGING/_tools/artifacts/"
   # ダッシュボードは案件データを含むため、空テンプレ版を配布
+  cp "$ROOT/_tools/artifacts/project-dashboard-template.html" "$STAGING/_tools/artifacts/"
   cp "$ROOT/_tools/artifacts/project-dashboard-template.html" "$STAGING/_tools/artifacts/project-dashboard.html"
 fi
 
