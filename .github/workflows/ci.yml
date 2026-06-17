@@ -1,0 +1,19 @@
+name: CI — 構造健全性 + 回帰eval
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 構造健全性チェック (build.sh --verify)
+        run: bash _tools/build.sh --verify
+
+      - name: 回帰eval — 機械チェック層 (eval.sh)
+        run: bash _tools/eval.sh
