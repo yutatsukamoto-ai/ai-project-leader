@@ -63,6 +63,36 @@ check_drift() {
   [[ $drift -eq 0 && $missing -eq 0 ]]
 }
 
+# manifest左辺にある正典ファイルと同名のreferencesコピーが、manifest右辺に登録されているか検査する。
+# 0=全コピーが管理下。manifest未登録コピーは --check の対象外になるため、verifyでここを塞ぐ。
+check_manifest_coverage() {
+  local root="$1" manifest="$2" problems=0 checked=0
+  local rhs_tmp names_tmp
+  rhs_tmp="$(mktemp)" || { echo "ERROR: 一時ファイルを作れない" >&2; return 2; }
+  names_tmp="$(mktemp)" || { rm -f "$rhs_tmp"; echo "ERROR: 一時ファイルを作れない" >&2; return 2; }
+
+  awk -F '\t' 'NF >= 2 && $1 !~ /^#/ && $1 != "" {print $2}' "$manifest" | sort -u > "$rhs_tmp"
+  awk -F '\t' 'NF >= 2 && $1 !~ /^#/ && $1 != "" {n=$1; sub(/^.*\//, "", n); print n}' "$manifest" | sort -u > "$names_tmp"
+
+  local name f rel
+  while IFS= read -r name; do
+    [[ -z "$name" ]] && continue
+    while IFS= read -r f; do
+      [[ -z "$f" ]] && continue
+      checked=$((checked+1))
+      rel="${f#$root/}"
+      if ! grep -qxF "$rel" "$rhs_tmp"; then
+        echo "❌ manifest未登録コピー: $rel"
+        problems=$((problems+1))
+      fi
+    done < <(find "$root/20_Skills" -path '*/references/*' -type f -name "$name" 2>/dev/null | sort)
+  done < "$names_tmp"
+
+  rm -f "$rhs_tmp" "$names_tmp"
+  echo "--- manifest coverage: ${checked}件中 未登録${problems} ---"
+  [[ $problems -eq 0 ]]
+}
+
 # 成果物マップ↔実構成の整合。$1=ROOT $2=成果物マップ.md。0=一致。
 #   A: SKILL.mdを持つ実在Skillがマップに載っているか（新Skillの記載漏れ検出）
 #   B: マップに載るSkill名らしき記載が実在するか（消えた/改名Skillの残骸検出）

@@ -5,6 +5,7 @@
 #   bash _tools/package-dist.sh              … _dist/ に配布フォルダを生成
 #   bash _tools/package-dist.sh --dry-run    … 何をコピーするか表示（実行しない）
 #   bash _tools/package-dist.sh --target claude-code
+#   bash _tools/package-dist.sh --target codex
 #
 # 3層モデル準拠:
 #   L1（配布）= 20_Skills + 40_Stock + 10_参考資料のPMBOK再構成 + _tools + README等
@@ -27,8 +28,8 @@ while [[ $# -gt 0 ]]; do
       ;;
     --target)
       TARGET="${2:-}"
-      [[ "$TARGET" == "cowork" || "$TARGET" == "claude-code" ]] || {
-        echo "ERROR: --target は cowork または claude-code を指定してください" >&2
+      [[ "$TARGET" == "cowork" || "$TARGET" == "claude-code" || "$TARGET" == "codex" ]] || {
+        echo "ERROR: --target は cowork / claude-code / codex のいずれかを指定してください" >&2
         exit 2
       }
       shift 2
@@ -148,6 +149,16 @@ if [[ "$TARGET" == "claude-code" ]]; then
   fi
 fi
 
+if [[ "$TARGET" == "codex" ]]; then
+  log "Codex: AGENTS.md・CODEX.md"
+  if [[ "$DRY" != "--dry-run" ]]; then
+    [[ -f "$ROOT/AGENTS.md" ]] || { echo "ERROR: AGENTS.md がありません" >&2; exit 2; }
+    [[ -f "$ROOT/CODEX.md" ]] || { echo "ERROR: CODEX.md がありません" >&2; exit 2; }
+    cp "$ROOT/AGENTS.md" "$STAGING/"
+    cp "$ROOT/CODEX.md" "$STAGING/"
+  fi
+fi
+
 # --- macOSメタデータ除外 ---
 log "除外: .DS_Store"
 if [[ "$DRY" != "--dry-run" ]]; then
@@ -166,11 +177,20 @@ log "✕ _backups/"
 log "✕ *.skill（build.shで再生成可）"
 log "✕ _tools/eval/judge-results/（判定結果はインスタンスデータ）"
 log "✕ _tools/eval/goldens.tsv（パスが案件データを参照→空テンプレに置換）"
-log "✕ AGENTS.md, CODEX.md（Claude Code用・Cowork配布には不要）"
+if [[ "$TARGET" != "codex" ]]; then
+  log "✕ AGENTS.md, CODEX.md（Codex用・$TARGET 配布には不要）"
+fi
+if [[ "$TARGET" != "claude-code" ]]; then
+  log "✕ CLAUDE.md, .claude/（Claude Code用・$TARGET 配布には不要）"
+fi
 
 if [[ "$DRY" == "--dry-run" ]]; then
   echo ""
-  echo "ドライラン完了。実行するには: bash _tools/package-dist.sh"
+  if [[ "$TARGET" == "cowork" ]]; then
+    echo "ドライラン完了。実行するには: bash _tools/package-dist.sh"
+  else
+    echo "ドライラン完了。実行するには: bash _tools/package-dist.sh --target $TARGET"
+  fi
   exit 0
 fi
 

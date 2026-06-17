@@ -36,6 +36,9 @@ verify() {
   echo "=== 共通項のドリフト ==="
   check_drift "$ROOT" "$MANIFEST" || problems=$((problems+1))
 
+  echo "=== 共通項のmanifest管理漏れ ==="
+  check_manifest_coverage "$ROOT" "$MANIFEST" || problems=$((problems+1))
+
   echo "=== 成果物マップ↔実構成 ==="
   check_map_consistency "$ROOT" "$ROOT/20_Skills/成果物マップ.md" || problems=$((problems+1))
 
