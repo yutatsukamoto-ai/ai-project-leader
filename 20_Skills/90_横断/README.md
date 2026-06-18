@@ -22,7 +22,8 @@
 
 - `grill-me/` … 1問ずつ＋推奨回答で依存ツリーを潰し共通理解に達する詰めの思考道具。前段の曖昧さ潰し・保留中の決定詰めに使う。
 - `gyoumu-flow-designer/` … 業務フローを方法論に基づいて設計し、FigJam/Miro/PPTX等の描画へつなぐ横断Skill。
-- `slide-craft/` … スライドのメッセージ設計・構成・レイアウト・デザイン・PPTX生成/レビューを支える横断Skill。
+- `image2-brand-slides/` … Codex版の主スライド生成Skill。ロゴ/Style Markdown/公式サイト/雰囲気からブランドルールを作り、Image2で1スライド1画像を生成する。
+- `slide-craft/` … 編集可能PPTXが必要な場合や既存PPTXレビューの補助Skill。Codex版の新規スライド生成は原則 `image2-brand-slides` を優先する。
 
 「横断」系の住み分け早見は `20_Skills/成果物マップ.md` の「横断・メタ」表が正典：
 

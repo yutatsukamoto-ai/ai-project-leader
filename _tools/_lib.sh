@@ -45,6 +45,7 @@ find_stray_archives() {
   find "$1/20_Skills" -type f \
     ! -name '*.skill' ! -name '*.md' ! -name '*.png' ! -name '*.jpg' ! -name '*.jpeg' \
     ! -name '*.pdf' ! -name '*.txt' ! -name '*.json' ! -name '*.html' ! -name '*.yaml' ! -name '*.yml' \
+    ! -name '*.py' \
     ! -name '.DS_Store' 2>/dev/null
 }
 
