@@ -1,0 +1,15 @@
+{
+  "title": "施工計画書レビューAI HTML smoke",
+  "format": "image-html-deck",
+  "slide_count": 2,
+  "slides": [
+    {
+      "file": "slides/01-title.png",
+      "title": "施工計画書レビューAI"
+    },
+    {
+      "file": "slides/02-normal.jpg",
+      "title": "ブランド素材表示テスト"
+    }
+  ]
+}

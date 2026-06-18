@@ -1,0 +1,27 @@
+{
+  "title": "layout_archetype_trial_preview",
+  "format": "image-html-deck",
+  "slide_count": 5,
+  "slides": [
+    {
+      "file": "slides/01-title.png",
+      "title": "AIプロジェクト推進の型"
+    },
+    {
+      "file": "slides/02-normal.png",
+      "title": "PoC開始前の課題"
+    },
+    {
+      "file": "slides/03-normal.png",
+      "title": "推進プロセス"
+    },
+    {
+      "file": "slides/04-normal.png",
+      "title": "成功条件"
+    },
+    {
+      "file": "slides/05-normal.png",
+      "title": "再利用資産"
+    }
+  ]
+}
