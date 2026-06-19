@@ -1,5 +1,5 @@
 {
-  "_comment": "hooks・permissions は段階的に設計。Claude Code版 Phase 1-4 の最小構成。",
+  "_comment": "hooks・permissions は段階的に設計。Claude Code版 Phase 1-4。",
   "hooks": {
     "PreToolUse": [
       {
@@ -18,7 +18,13 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/auto-build.sh"
+            "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/auto-build.sh",
+            "timeout": 60
+          },
+          {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/auto-eval.sh",
+            "timeout": 60
           }
         ]
       }
@@ -28,7 +34,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/auto-eval.sh"
+            "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/auto-eval.sh",
+            "timeout": 120
           }
         ]
       }
