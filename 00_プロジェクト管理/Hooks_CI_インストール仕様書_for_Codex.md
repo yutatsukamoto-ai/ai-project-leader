@@ -3,6 +3,8 @@
 作成: 2026-06-19
 目的: Cowork側で作成・テスト済みのHooks/CI基盤ファイルを `.claude/` 配下に配置し、動作確認して commit する。
 
+状態: **完了済み**。実装コミットは `8829b7b`、CC実環境検証は `5567393`、auto-build偽陽性修正は `d4988e7`、CI配布smoke修正は `48f1abe`。本書はインストール履歴として残す。現行実装は `.claude/` と `_tools/` を正とする。
+
 ## 前提
 
 - API仕様の裏取り済（docs.anthropic.com/en/docs/claude-code/hooks, 2026-06-19）
@@ -20,7 +22,7 @@
 ## やらないこと
 
 - gate-check.sh は変更しない（既にAPI仕様と整合済み）
-- settings.local.json は存在しない（作成不要）
+- `.claude/settings.local.json` はローカル許可用で配布対象外。存在してもHook発火の正典ではないため、削除・上書きしない
 - _tools/test-hooks.sh は変更済み（そのまま使う）
 
 ---
@@ -76,7 +78,7 @@ fi
 # 20_Skills配下のSKILL.mdが編集された → そのSkillを再ビルド
 if [[ "$REL" == 20_Skills/*/SKILL.md || "$REL" == 20_Skills/*/*/SKILL.md ]]; then
   SKILL_DIR="$(dirname "$FILE_PATH")"
-  RESULT=$(bash "$PROJECT_DIR/_tools/build.sh" "$SKILL_DIR" 2>&1)
+  RESULT=$(bash "$PROJECT_DIR/_tools/build.sh" --build-only "$SKILL_DIR" 2>&1)
   EXIT_CODE=$?
   log_result "build skill ${SKILL_DIR#$PROJECT_DIR/}" "$RESULT"
   if [[ $EXIT_CODE -ne 0 ]]; then
@@ -348,6 +350,7 @@ model: sonnet
 - 内部5秒タイムアウトと `run_with_timeout` / heredocラッパーを除去（タイムアウトは settings.json の timeout フィールドで制御）
 - 出力形式を PostToolUse 正式の `additionalContext` JSON に変更（旧: 平文エラー / 空の `{}`）
 - SKILL.md パスの glob に `20_Skills/*/*/SKILL.md`（サブフォルダ）を追加
+- hook内の単一Skillビルドは `build.sh --build-only` を使用し、全verify由来の偽陽性を避ける
 
 ### auto-eval.sh（全面書き換え）
 - `hook_event_name` フィールドで PostToolUse / TaskCompleted を判別する二刀流に

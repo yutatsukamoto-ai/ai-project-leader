@@ -23,7 +23,7 @@ Codexでまだ本格運用しないこと:
 
 - 承認なしのフェーズ移行
 - 実案件データを含む成果物の配布物化
-- Hooks/CI/LLM-judge自動化を前提にした無人運用
+- Claude Code側のHooks/CI/LLM-judge自動化を前提にした無人運用
 - `.codex/` 専用設定の追加（必要になった時点で設計する）
 
 Codex配布版を作るとき:
@@ -140,6 +140,8 @@ bash _tools/test-dist-codex.sh
 Claude Code配布に影響する変更なら、既存ターゲットも壊していないか確認する：
 
 ```bash
+bash _tools/test-hooks.sh
+bash _tools/build.sh --sync-cc
 bash _tools/package-dist.sh --target claude-code
 bash _tools/test-dist-cc.sh
 ```

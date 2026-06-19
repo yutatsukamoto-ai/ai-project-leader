@@ -16,7 +16,8 @@ Claude Cowork / Claude Code / Codex 向けSkill群とナレッジ基盤。
 ## 現在の前提
 
 - 現在の主戦場は Claude Cowork。まず中身・骨組み・配布用Skillを締める。
-- Claude Code / Codex 対応は段階導入。Hooks、CI、LLM-judge自動化は後続フェーズの宿題。
+- Claude Code対応は段階導入済み。Hooks強制・auto-eval・auto-build・CI smoke・subagent定義は実装/実環境検証済み。
+- 残る後続フェーズは、3案件目実証、W-02監視push化、M-08のCopilot等へのポータビリティ検証、M-09学習還流。
 - Codex版は現時点では、リポジトリ編集・検証・配布生成・スライド生成補助の入口として使う。
 - Codexで新規スライドを作る場合、特に指定がなければ必ず `image2-brand-slides` の流れで進める。`slide-craft` は編集可能PPTXが明示された場合や既存PPTXレビュー時の補助に限る。
 - Codex配布版は `bash _tools/package-dist.sh --target codex` で作る。配布版には `AGENTS.md` と `CODEX.md` を含め、Claude Code専用の `CLAUDE.md` / `.claude/` は含めない。
@@ -82,16 +83,18 @@ Claude Cowork / Claude Code / Codex 向けSkill群とナレッジ基盤。
 - 構造健全性: `bash _tools/build.sh --verify`
 - 共通項ドリフトだけ確認: `bash _tools/build.sh --check`
 - 成果物の回帰eval: `bash _tools/eval.sh`
+- Hook smoke: `bash _tools/test-hooks.sh`
 - Skill改訂時、モデル交代時、配布前は `build.sh --verify` と必要範囲の `eval.sh` を流す。
 - Codex配布版: `bash _tools/package-dist.sh --target codex` → `bash _tools/test-dist-codex.sh`
-- Claude Code配布版: `bash _tools/package-dist.sh --target claude-code` → `bash _tools/test-dist-cc.sh`
+- Claude Code配布版: `bash _tools/build.sh --sync-cc` → `bash _tools/package-dist.sh --target claude-code` → `bash _tools/test-dist-cc.sh`
 
 ## 後続フェーズの宿題
 
 - ~~停止ポイントのHooks強制。~~ → **CC実環境検証済（2026-06-19 M-05解決）**
 - ~~`eval.sh` のHook/CI化。~~ → **auto-eval.sh（PostToolUse+TaskCompleted）＋CI追加済み（2026-06-19）**
-- LLM-judge / subagent による目視層の自動化。
-- M-08 ポータビリティ検証。
+- LLM-judge / subagent による目視層の本格運用。
+- M-08 ポータビリティ検証（Claude Code基盤は確認済み。残はCopilot等への転用可否）。
+- W-02 監視push化（3案件目実証後に着手判断）。
 
 詳細は `00_プロジェクト管理/Claude_Code版を作るときの覚書_モデル堅牢性.md` と
 `00_プロジェクト管理/この時点でやるべきこと棚卸し_2026-06-15_v2.md` を参照。

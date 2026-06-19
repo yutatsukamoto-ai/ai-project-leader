@@ -4,6 +4,8 @@
 目的: Cowork版で蓄積した設計をClaude Code版に移植する。本書をClaude Codeに渡して「これを順にやって」と言える粒度で書く。
 前提ドキュメント: `00_プロジェクト管理/Claude_Code版を作るときの覚書_モデル堅牢性.md`（設計意図の正典）
 
+状態: **Phase 0〜5は完了済み（2026-06-19）**。本書は実装仕様兼履歴として残す。現行運用の確認は `CLAUDE.md`、`.claude/settings.json`、`_tools/test-hooks.sh`、`_tools/test-dist-cc.sh` を正とする。
+
 > **最初にやること**: 本書の設定キー・API名は2026-06-17時点の公式ドキュメントに基づく。着手時に `https://docs.anthropic.com/en/docs/claude-code/hooks` と `https://code.claude.com/docs/en/sub-agents` で裏取りし、変わっていたら本書を更新してから実装に入ること。
 
 ---
@@ -41,7 +43,7 @@ Phase 4（自動回復＋移植の仕上げ）✅ 実装済 2026-06-19
 Phase 5（実地テスト）
   └─ WI-08: Hooks基盤CC実環境検証                ✅ 検証完了 2026-06-19
 
-  ※ Phase 1-5 全完了。次はW-02（監視push化）着手判断。
+  ※ Phase 1-5 全完了。次は3案件目実証後にW-02（監視push化）着手判断。
 ```
 
 Phase 1→2→3は依存順。Phase 4は3と並行可。Phase 5はWI-01〜07完了後に手動実施。
@@ -506,7 +508,7 @@ WI-01〜07の実装後に、以下を実地確認する。
 | project-context.md の読み込み | Skill内で明示参照しているので動くはず | 🟡 未確認（フル実案件実走は3案件目スコープ）|
 | chain-trace.json の書き込み | bashスクリプトなのでそのまま | 🟡 未確認（フル実案件実走は3案件目スコープ）|
 
-**残リスク**: hook実行環境（locale差異）でpost-build verify()のwbs-builder偽陽性が発生するケースあり（手動実行では再現せず）。
+**追加修正（2026-06-19）**: hook実行時のpost-build全verifyに由来するwbs-builder偽陽性は、`build.sh --build-only`追加とauto-build hookの切替で解消済み。
 
 ### How（実施済）
 WI-01〜07の動作をClaude Code実セッションで直接検証。gate-check.sh deny/allow・auto-eval.sh PostToolUse発火・auto-build.sh SKILL.md編集トリガーを実動作で確認。

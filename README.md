@@ -185,6 +185,8 @@ push / PR で GitHub Actions が自動実行します（`.github/workflows/ci.ym
 
 - **構造健全性** (`build.sh --verify`): .skill の壊れ・ゴミ・共通項ドリフト・マップ整合
 - **回帰eval 機械層** (`eval.sh`): 50件のゴールデンに対するファイル存在＋核トークン検査
+- **Claude Code Hooks smoke** (`test-hooks.sh`): gate-check / auto-build / auto-eval / subagent定義の静的・擬似stdin検査
+- **Claude Code配布 smoke** (`build.sh --sync-cc` → `package-dist.sh --target claude-code` → `test-dist-cc.sh`): `.claude/skills/` 同期と配布物の危険物混入検査
 
 LLM-judge（目視層）は API コスト・判定の再現性の都合で手動運用としています。`bash _tools/eval-judge.sh` でプロンプトを自動生成し、Claude 等で判定します。
 
@@ -200,7 +202,8 @@ bash _tools/test-dist-codex.sh
 Claude Code向け:
 
 ```bash
-bash _tools/package-dist.sh --target cc
+bash _tools/build.sh --sync-cc
+bash _tools/package-dist.sh --target claude-code
 bash _tools/test-dist-cc.sh
 ```
 
@@ -225,9 +228,12 @@ Codex配布版には `AGENTS.md` と `CODEX.md` を含めます。Claude Code配
 - 全フェーズの主要Skillとchainは作成済み
 - 模擬4案件で end-to-end 完走済み
 - 回帰evalとLLM-judgeの基盤は稼働済み
+- Claude Code版のHooks/CI基盤は実装・実環境検証済み
+- GitHub Actionsで構造検証・eval・Hook smoke・Claude Code配布 smoke を確認済み
 
 ### 今後
 
+- 3案件目実証（新入力形式）で前段〜立ち上げの横展開を確認
 - 実案件での適用とフィードバックによる品質改善
 - Skill間の受け渡し精度の向上
 - 成果物テンプレートの業種別バリエーション追加
