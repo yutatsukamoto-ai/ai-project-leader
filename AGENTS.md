@@ -17,7 +17,8 @@ Claude Cowork / Claude Code / Codex 向けSkill群とナレッジ基盤。
 
 - 現在の主戦場は Claude Cowork。まず中身・骨組み・配布用Skillを締める。
 - Claude Code / Codex 対応は段階導入。Hooks、CI、LLM-judge自動化は後続フェーズの宿題。
-- Codex版は現時点では、リポジトリ編集・検証・配布生成・`slide-craft` 改善の入口として使う。
+- Codex版は現時点では、リポジトリ編集・検証・配布生成・スライド生成補助の入口として使う。
+- Codexで新規スライドを作る場合、特に指定がなければ必ず `image2-brand-slides` の流れで進める。`slide-craft` は編集可能PPTXが明示された場合や既存PPTXレビュー時の補助に限る。
 - Codex配布版は `bash _tools/package-dist.sh --target codex` で作る。配布版には `AGENTS.md` と `CODEX.md` を含め、Claude Code専用の `CLAUDE.md` / `.claude/` は含めない。
 
 ## 作業時の約束
@@ -28,6 +29,7 @@ Claude Cowork / Claude Code / Codex 向けSkill群とナレッジ基盤。
 - 実案件データは `30_Flow/` 内に置き、配布・Stock化するときは脱識別する。
 - ユーザーが実案件を「○○の件」「○○案件」などフラットに呼んだら、まず `30_Flow/実案件/案件インデックス.md` があるか確認し、該当案件の `project-context.md` と `00_案件ステータス.md` を読んでから返答する。
 - 客先提出版に内部用の検査レシートや管理メタをそのまま混ぜない。
+- Codexでスライド作成依頼を受けたら、明示指定がない限り `image2-brand-slides` を使う。PPTXレンダー流用やDOM手組みHTMLで代替せず、`message_design.md` → `deck_structure.md` → `design_system.md` → `prompts/` → Image2生成 → HTMLデッキ化の順で進める。
 
 ## 初回案件の進め方
 

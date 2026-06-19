@@ -28,13 +28,13 @@
 
 各項目に「効く急所」を併記。着手時はここから拾う。
 
-- [ ] **停止ポイントをHooksで構造強制**（急所1）。まず**不可逆・高stakesの✋✋だけ**先に（前段0-4承認・計画承認・終結の提出版docx確定）。承認マーカー（例: 直近成果物に承認記録）が無ければ次フェーズ着手や提出版書き出しをブロックする型のHookを置く。全停止の鍵化は後。
-- [ ] **eval.shをHook/CIで自動実行**（急所2）。成果物の書き込み後、またはモデル交代時に機械層を自動で回し、FAILで止める。
-- [ ] **LLM-judge（subagent）で目視層を自動化**（急所2）。`judge-prompt.md`をsubagent化し、ゴールデンを質の観点で判定→結果を記録。機械層（型）と二段で守る。
-- [ ] **build/verifyのHook化**（基盤防御）。コミット前に `build.sh --verify`、正典編集後に `build.sh --sync` を自動。手作業忘れ（Save skill手動・同期し忘れ）を構造で潰す。※2026-06-15にsync.shをbuild.shへ統合済（sync.shは後方互換ラッパー）。
-- [ ] **一段落チェックポイントのHook化**（節目で自動発火＝戦闘後の自動回復に相当）。一段落（フェーズ移行・成果物/タスクのまとまり完了）の検知後、宿題棚卸し＋衛生チェック＋次の一手提示のルーチンを自動で回す。Coworkではメモリー常時ロードで"オーラ"化済（2026-06-15・メモリー `checkpoint-routine-at-milestones`）。CC版でHookに格上げし真の自動発火にする。発火は節目限定＝形骸化させない。
+- [x] **停止ポイントをHooksで構造強制**（急所1）。gate-check.sh（PreToolUse: 3ゲート）実装・テスト済（2026-06-19）。
+- [x] **eval.shをHook/CIで自動実行**（急所2）。auto-eval.sh（PostToolUse+TaskCompleted）実装・テスト済（2026-06-19）。
+- [x] **LLM-judge（subagent）で目視層を自動化**（急所2）。eval-judge.md（model: opus）定義済（2026-06-19）。
+- [x] **build/verifyのHook化**（基盤防御）。auto-build.sh（PostToolUse: sync/rebuild）実装・テスト済（2026-06-19）。
+- [x] **一段落チェックポイントのHook化**（Stop prompt hook）。settings.jsonのStop hook判定者で実装済（2026-06-19）。
 - [ ] **M-08 ポータビリティの確定**。`.skill`形式・description トリガー・停止の前提のうち、Claude Codeで変わる所／そのまま動く所を実地で確認し、移植で壊れる箇所を洗う。
-- [ ] **モデル使い分けを設定で表現**。作る系タスクは強モデル指定、回す系は寛容、をプロジェクト設定/サブエージェントのモデル指定で固定（急所3）。
+- [x] **モデル使い分けを設定で表現**。eval-judge=opus、researcher/integrity-checker/status-aggregator=sonnet（2026-06-19）。
 
 ## 4. 移植の対応関係（Cowork機構 → Claude Code）
 

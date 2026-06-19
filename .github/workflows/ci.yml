@@ -17,3 +17,11 @@ jobs:
 
       - name: 回帰eval — 機械チェック層 (eval.sh)
         run: bash _tools/eval.sh
+
+      - name: Hook scripts smoke test
+        run: bash _tools/test-hooks.sh
+
+      - name: Claude Code distribution smoke test
+        run: |
+          bash _tools/package-dist.sh --target claude-code
+          bash _tools/test-dist-cc.sh

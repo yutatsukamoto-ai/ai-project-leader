@@ -7,13 +7,14 @@
 
 ## 0. Codex版の現在地
 
-Codex版は、まず **リポジトリ編集・検証・配布生成・slide-craft改善** を安全に進めるための入口として扱う。
+Codex版は、まず **リポジトリ編集・検証・配布生成・スライド生成補助** を安全に進めるための入口として扱う。
 案件チェーン本番運用の主戦場は引き続き Claude Cowork。Codexで案件成果物を作る場合も、停止ポイントと承認ゲートはCowork版と同じ扱いにする。
 
 Codexで今できること:
 
 - Skill本文・references・横断ガイドラインの編集
-- `slide-craft` の構成案作成、レビュー、PPTX生成補助
+- スライド新規作成は原則 `image2-brand-slides` の手順で進める
+- `slide-craft` は編集可能PPTXが明示的に必要な場合、既存PPTXレビュー、またはユーザー承認済みの切替時だけ使う
 - `build.sh --verify` / `--check` / `eval.sh` による検証
 - `package-dist.sh --target codex` によるCodex配布フォルダ生成
 - GitHub反映前の差分確認、危険物混入確認、コミット・push
@@ -33,6 +34,33 @@ bash _tools/test-dist-codex.sh
 ```
 
 配布版には `AGENTS.md` と `CODEX.md` を含める。`CLAUDE.md` と `.claude/` はClaude Code専用なので含めない。
+
+### Codexでスライドを作るとき
+
+ユーザーから特に指定がない限り、Codexでの新規スライド作成は必ず `image2-brand-slides` の流れで進める。
+
+標準手順:
+
+1. `message_design.md` で意味設計を固める
+2. `deck_structure.md` で全スライドの主張・根拠・構図を固定する
+3. `design_system.md` でブランド/トーンを決める
+4. `prompts/` を1枚ずつ作る
+5. Image2で1スライド1画像を生成する
+6. 最初の3〜5枚で止めて確認を取る
+7. 承認後に残りを生成し、最終PNGを `export/html/index.html` にまとめる
+
+やらないこと:
+
+- 明示指定なしに `slide-craft` / 編集可能PPTX生成へ切り替えない
+- PPTXレンダー画像をHTML版の正本として流用しない
+- DOM/HTML/CSSでスライド本文を手組みして代替しない
+- 画像生成前の構成確認を飛ばさない
+
+例外:
+
+- ユーザーが「編集可能なPPTX」「PowerPointで編集できる形」と明示した場合
+- 既存PPTXのレビュー・修正が主目的の場合
+- Image2が使えず、ユーザーが代替手段への切替を明示承認した場合
 
 ---
 
