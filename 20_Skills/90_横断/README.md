@@ -24,6 +24,7 @@
 - `gyoumu-flow-designer/` … 業務フローを方法論に基づいて設計し、FigJam/Miro/PPTX等の描画へつなぐ横断Skill。
 - `image2-brand-slides/` … Codex版の主スライド生成Skill。ロゴ/Style Markdown/公式サイト/雰囲気からブランドルールを作り、Image2で1スライド1画像を生成し、HTMLデッキにまとめる。
 - `slide-craft/` … 編集可能PPTXが必要な場合や既存PPTXレビューの補助Skill。Codex版の新規スライド生成は原則 `image2-brand-slides` を優先する。
+- `slide-quality-check/` … slide-craftが生成したPPTXの品質検査Skill。テキストはみ出し・配色逸脱・レイアウト崩れを検知する。
 
 「横断」系の住み分け早見は `20_Skills/成果物マップ.md` の「横断・メタ」表が正典：
 

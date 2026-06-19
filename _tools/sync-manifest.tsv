@@ -3,7 +3,7 @@
 # コピー先が 20_Skills/.../references/ 配下なら、その Skill の .skill は sync 時に自動で再パッケージされる。
 # 共通項が増えたら（図の書き方ガイドライン・新Skill等）ここに行を足すだけで sync/check の対象になる。
 #
-# --- 文章作法（正典: 40_Stock/横断ガイドライン）→ 5 Skill ---
+# --- 文章作法（正典: 40_Stock/横断ガイドライン）→ 23 Skill ---
 40_Stock/横断ガイドライン/文章作法.md	20_Skills/00_前段/anken-rikai-summary/references/文章作法.md
 40_Stock/横断ガイドライン/文章作法.md	20_Skills/00_前段/kadai-kasetsu-sheet/references/文章作法.md
 40_Stock/横断ガイドライン/文章作法.md	20_Skills/00_前段/research-memo/references/文章作法.md

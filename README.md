@@ -14,10 +14,11 @@
 | | |
 |---|---|
 | 準拠フレーム | PMBOK第8版（6原則・7ドメイン・40プロセス） |
-| 運用Skill | 32（前段・立ち上げ・計画・実行・監視・終結・横断） |
-| メタSkill | 2（Skill作成支援・壁打ちキックオフ） |
-| パッケージ | 34 `.skill` |
-| 回帰テスト | 47件のゴールデン（LLM-judge用プロンプト生成あり） |
+| 運用Skill | 30（前段・立ち上げ・計画・実行・監視・終結・横断） |
+| メタSkill | 3（Skill作成支援・壁打ちキックオフ・位置確認） |
+| chain | 6（フェーズ別オーケストレーター） |
+| パッケージ | 37 `.skill` |
+| 回帰テスト | 50件のゴールデン（LLM-judge用プロンプト生成あり） |
 | 模擬完走 | 4案件で全フェーズ検証済み |
 
 ---
@@ -138,8 +139,8 @@ AIプロジェクトリーダー/
 │   ├── 03_実行/                    # 課題管理、コミュニケーション、資源管理
 │   ├── 04_監視コントロール/         # 状況報告、変更管理
 │   ├── 05_終結/                    # 終結報告
-│   ├── 90_横断/                    # grill-me、業務フロー設計、slide-craft
-│   └── 99_メタ/                    # Skill作成支援
+│   ├── 90_横断/                    # grill-me、業務フロー設計、スライド系3種
+│   └── 99_メタ/                    # Skill作成支援、壁打ちキックオフ、位置確認
 ├── 30_Flow/                        # 案件ごとの作業フォルダ
 ├── 40_Stock/                       # 横断ガイドライン・ナレッジ・テンプレート・案件教訓
 ├── 50_サンプル成果物/              # docx / pptx / xlsx サンプル
@@ -183,7 +184,7 @@ bash _tools/build.sh --all
 push / PR で GitHub Actions が自動実行します（`.github/workflows/ci.yml`）。
 
 - **構造健全性** (`build.sh --verify`): .skill の壊れ・ゴミ・共通項ドリフト・マップ整合
-- **回帰eval 機械層** (`eval.sh`): 47件のゴールデンに対するファイル存在＋核トークン検査
+- **回帰eval 機械層** (`eval.sh`): 50件のゴールデンに対するファイル存在＋核トークン検査
 
 LLM-judge（目視層）は API コスト・判定の再現性の都合で手動運用としています。`bash _tools/eval-judge.sh` でプロンプトを自動生成し、Claude 等で判定します。
 
@@ -196,7 +197,14 @@ bash _tools/package-dist.sh --target codex
 bash _tools/test-dist-codex.sh
 ```
 
-Codex配布版には `AGENTS.md` と `CODEX.md` を含めます。Claude Code専用の `CLAUDE.md` と `.claude/` は含めません。
+Claude Code向け:
+
+```bash
+bash _tools/package-dist.sh --target cc
+bash _tools/test-dist-cc.sh
+```
+
+Codex配布版には `AGENTS.md` と `CODEX.md` を含めます。Claude Code配布版には `CLAUDE.md` と `.claude/` を含めます。
 
 ---
 
