@@ -88,8 +88,8 @@ Claude Cowork / Claude Code / Codex 向けSkill群とナレッジ基盤。
 
 ## 後続フェーズの宿題
 
-- 停止ポイントのHooks強制。
-- `eval.sh` のHook/CI化。
+- ~~停止ポイントのHooks強制。~~ → **CC実環境検証済（2026-06-19 M-05解決）**
+- ~~`eval.sh` のHook/CI化。~~ → **auto-eval.sh（PostToolUse+TaskCompleted）＋CI追加済み（2026-06-19）**
 - LLM-judge / subagent による目視層の自動化。
 - M-08 ポータビリティ検証。
 
