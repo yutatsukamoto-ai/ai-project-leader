@@ -148,7 +148,7 @@ if [[ "$TARGET" == "claude-code" ]]; then
     [[ -f "$ROOT/CLAUDE.md" ]] || { echo "ERROR: CLAUDE.md がありません" >&2; exit 2; }
     [[ -d "$ROOT/.claude" ]] || { echo "ERROR: .claude/ がありません" >&2; exit 2; }
     cp "$ROOT/CLAUDE.md" "$STAGING/"
-    rsync -a --exclude='.DS_Store' "$ROOT/.claude/" "$STAGING/.claude/"
+    rsync -a --exclude='.DS_Store' --exclude='settings.local.json' "$ROOT/.claude/" "$STAGING/.claude/"
   fi
 fi
 

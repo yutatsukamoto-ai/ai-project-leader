@@ -29,7 +29,10 @@ check_absent() {
 check_file "$DIST/.claude/settings.json"
 check_file "$DIST/.claude/agents/eval-judge.md"
 
-skill_count="$(find "$DIST/.claude/skills" -type f -name SKILL.md 2>/dev/null | wc -l | tr -d ' ')"
+skill_count=0
+if [[ -d "$DIST/.claude/skills" ]]; then
+  skill_count="$(find "$DIST/.claude/skills" -type f -name SKILL.md 2>/dev/null | wc -l | tr -d ' ')"
+fi
 if [[ "$skill_count" -gt 0 ]]; then
   echo "✅ Claude Code skills: $skill_count"
 else
@@ -40,6 +43,7 @@ fi
 check_file "$DIST/CLAUDE.md"
 check_absent "$DIST/AGENTS.md"
 check_absent "$DIST/CODEX.md"
+check_absent "$DIST/.claude/settings.local.json"
 
 ds_store_count="$(find "$DIST" -name .DS_Store -type f 2>/dev/null | wc -l | tr -d ' ')"
 if [[ "$ds_store_count" -eq 0 ]]; then
