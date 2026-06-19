@@ -3,6 +3,7 @@
 `deck_structure.md` と `prompts/` の間で、各スライドの役割・構図・強調方法を決めるためのガイド。
 
 目的は、ブランド色や余白だけを変えた同型スライドの量産を防ぎ、資料テーマごとに見せ方を翻訳すること。
+ただし、構図の差分は装飾目的で作らない。ページの主張、読者の問い、根拠の見せ方から選ぶ。
 
 ---
 
@@ -22,6 +23,10 @@
 ```text
 navigation_title:
 message_headline:
+reader_question:
+page_claim:
+evidence_status:
+layout_reason:
 visual_focus:
 emphasis_reason:
 logic_pattern:
@@ -82,12 +87,15 @@ emphasis_pattern:
 ## 選び方
 
 1. まず `slide_role` を決める。
-2. `navigation_title` でページカテゴリを短く決める。
-3. `message_headline` でそのページの結論、判断、変化、課題、条件を言う。
-4. `visual_focus` と `emphasis_reason` を決める。
-5. そのスライドで読み手に起こしたい認知を決める。
-6. 認知に合う `emphasis_pattern` を選ぶ。
-7. 最後に `layout_archetype` を選ぶ。
+2. `reader_question` で、読者がこのページで解きたい問いを決める。
+3. `page_claim` で、そのページが言い切る主張を決める。
+4. `evidence_status` で、主張の根拠が事実、入力上の前提、推測、欠落のどれかを決める。
+5. `navigation_title` でページカテゴリを短く決める。
+6. `message_headline` で `page_claim` を読者向けに短く言う。
+7. `visual_focus` と `emphasis_reason` を決める。
+8. そのスライドで読み手に起こしたい認知を決める。
+9. 認知に合う `emphasis_pattern` を選ぶ。
+10. 最後に `layout_archetype` を選び、`layout_reason` に理由を残す。
 
 例:
 
@@ -100,6 +108,15 @@ emphasis_pattern:
 | process | 入力、作業、成果物の流れが分かる | sequence | logic_exhibit |
 | workshop | 自分で考え始める | question | workshop_canvas |
 | summary | 次に何を判断するか分かる | decision_axis | summary_rows |
+
+意味から選ぶ例:
+
+| page_claimの性質 | 避けたい選び方 | 選びたい型 |
+|---|---|---|
+| 課題の深刻さを示す | きれいな3カードに分けるだけ | issue_emphasis_tree / evidence_board |
+| 意思決定材料を示す | 大きな数字やアイコンを飾る | decision_table / recommendation_matrix |
+| PoCの進め方を示す | 抽象図形を並べる | flow_type / process_swimlane |
+| 提案の妥当性を示す | 世界観イラストだけで押す | issue_solution_tree / proposal_logic_tree |
 
 ---
 

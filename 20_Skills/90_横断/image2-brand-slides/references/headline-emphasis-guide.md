@@ -17,7 +17,7 @@ supporting_message:
 ```
 
 - `navigation_title`: ページのカテゴリ。短い名詞句で、どの話題かを示す。
-- `message_headline`: そのページで読み手に持ち帰ってほしい結論、判断、変化。
+- `message_headline`: そのページで読み手に持ち帰ってほしい結論、判断、変化。`message_design.md` の `page_claim` を読者向けに短く言い換えたもの。
 - `supporting_message`: なぜそう言えるか、何を見るべきかを補足する1文。
 
 通常スライドの固定ヘッダーに置くのは `navigation_title`。  
@@ -56,6 +56,7 @@ supporting_message:
 ## message_headline
 
 ページの主張。本文を読まなくても、何を言いたいページかが分かるようにする。
+原稿に根拠がない場合は、断定見出しにしない。仮説、問い、検証対象、判断材料として表現する。
 
 型:
 
@@ -135,12 +136,16 @@ supporting_message:
 navigation_title:
 message_headline:
 supporting_message:
+page_claim:
+evidence_status:
 visual_focus:
 emphasis_reason:
 ```
 
 - `visual_focus`: 何を視覚的な中心にするか。例: 1つのKPI、比較表、工程線、関係図。
 - `emphasis_reason`: なぜそれを大きくするか。理由が言えない場合は大きくしない。
+- `page_claim`: そのページで言い切る主張。
+- `evidence_status`: 主張の根拠が fact / provided_assumption / inferred / missing のどれか。`missing` の場合は断定しない。
 
 ---
 

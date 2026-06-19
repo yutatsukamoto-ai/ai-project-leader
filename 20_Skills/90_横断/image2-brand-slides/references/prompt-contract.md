@@ -16,6 +16,9 @@
 - Use the provided brand system faithfully.
 - Make Japanese text as accurate and readable as possible.
 - Do not imitate unrelated templates.
+- Preserve the approved page claim and evidence status; do not invent facts, metrics, effects, dates, or client-specific details.
+- If evidence is weak, present the message as a hypothesis, scope, question, or draft assumption rather than a proven fact.
+- Respect the content mode. In production mode, avoid overclaiming. In design-trial mode, keep the visual trial separate from factual approval.
 - Translate the brand anchor into the slide theme; do not mimic the company website, screenshots, or logo style directly unless explicitly requested.
 - Use a reference-informed consulting proposal style unless another style was explicitly requested.
 - Use consulting references for structure and logic, not for copying their exact blue visual template.
@@ -46,6 +49,8 @@
 - One clear key message.
 - Separate the small navigation title from the main message headline.
 - The small navigation title should state the page category; the main headline should state the conclusion, decision, change, issue, condition, or scope.
+- Choose the layout from the slide's meaning: problem severity, decision material, process design, evidence, proposal relationship, or workshop question.
+- Do not choose layout variation only for visual variety; every layout choice must support the page claim.
 - Separate the quiet visual style from the consulting logic structure.
 - Two or three content groups at most.
 - Thin line icons, purposeful abstract diagrams, labeled structural shapes, and structured logic blocks.
@@ -129,12 +134,13 @@ Normal slide:
 7. Emphasis pattern
 8. Navigation title
 9. Message headline
-10. Supporting message
-11. Visual focus and emphasis reason
-12. Logic pattern, purpose, primary read, and structure notes
-13. Color role and highlight rule
-14. スライド内容
-15. Negative constraints
+10. Content mode, reader question, page claim, and evidence status
+11. Supporting message
+12. Visual focus and emphasis reason
+13. Logic pattern, purpose, primary read, and structure notes
+14. Color role and highlight rule
+15. スライド内容
+16. Negative constraints
 
 ### Layout Instructions
 
@@ -146,6 +152,10 @@ Layout archetype: <editorial_statement / split_visual / before_after / process_f
 Emphasis pattern: <statement / contrast / sequence / proof / question / decision_axis / checklist / scene / relationship>.
 Navigation title: <short category label for the fixed header>.
 Message headline: <the main takeaway, decision, change, issue, condition, or scope>.
+Content mode: <production / design_trial>.
+Reader question: <what the reader should be able to answer on this page>.
+Page claim: <the one claim this page must communicate>.
+Evidence status: <fact / provided_assumption / inferred / missing>. If inferred or missing, avoid overclaiming.
 Supporting message: <one short sentence that tells the reader how to read the slide>.
 Visual focus: <what should be visually dominant>.
 Emphasis reason: <why that element deserves emphasis>.
@@ -180,6 +190,11 @@ Do not reuse the same layout pattern as the previous slide unless continuity is 
 - No rigid spreadsheet look unless the content truly requires a table.
 - No decorative meaningless blobs.
 - No unlabeled decorative circles or bubbles.
+- No orphan lines, arrows, circles, icons, or chart-like marks without a clear semantic role.
+- No connector lines crossing body text, headings, or card borders.
+- No misaligned icon-and-text callouts; align the icon center and text optical center.
+- No downward arrow or support shape that is off-center from its parent diagram.
+- No headline and supporting text block with an accidental axis mismatch.
 - No busy mockup scene unless explicitly requested.
 - No heavy gradients or ornamental backgrounds.
 - No heavy bold typography unless explicitly requested.
@@ -187,6 +202,9 @@ Do not reuse the same layout pattern as the previous slide unless continuity is 
 - No visible page numbers.
 - No numbered slide titles.
 - No vague headline such as "about", "important points", or "future topics".
+- No vague page claim.
+- No invented metrics, dates, effects, client facts, or proof.
+- No presenting an inferred or missing-evidence claim as a confirmed fact.
 - No oversized item counts, chapter numbers, or auxiliary labels unless they are the actual key metric.
 - No loose poster-like infographic when the slide needs issue analysis, option comparison, process design, workplan, or decision criteria.
 - No decorative connectors; use arrows and lines only to show actual relationships.
