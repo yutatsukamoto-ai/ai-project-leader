@@ -14,6 +14,9 @@
 # 実案件フォルダは丸ごと除外（D-01・顧客データ保護）
 30_Flow/実案件/
 
+# --- テスト生成物（バイナリ/大容量。再生成可）---
+30_Flow/テスト/Skillテスト_image2-brand-slides/sales_cubs_consulting_sample/
+
 # --- 生成済みインスタンス（テンプレートから再生成可）---
 _tools/artifacts/project-dashboard.html
 50_サンプル成果物/
