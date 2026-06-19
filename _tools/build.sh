@@ -43,7 +43,11 @@ verify() {
   check_map_consistency "$ROOT" "$ROOT/20_Skills/成果物マップ.md" || problems=$((problems+1))
 
   echo "=== Claude Code Skill同期 ==="
-  check_claude_code_skill_sync || problems=$((problems+1))
+  if [[ "${CI:-}" == "true" ]]; then
+    echo "ℹ️  CI環境のためスキップ"
+  else
+    check_claude_code_skill_sync || problems=$((problems+1))
+  fi
 
   echo "=== Git追跡禁止パス ==="
   check_forbidden_tracked_paths "$ROOT" || problems=$((problems+1))

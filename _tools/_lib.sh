@@ -72,7 +72,10 @@ check_manifest_coverage() {
   rhs_tmp="$(mktemp)" || { echo "ERROR: 一時ファイルを作れない" >&2; return 2; }
   names_tmp="$(mktemp)" || { rm -f "$rhs_tmp"; echo "ERROR: 一時ファイルを作れない" >&2; return 2; }
 
+  local lhs_tmp
+  lhs_tmp="$(mktemp)" || { rm -f "$rhs_tmp" "$names_tmp"; echo "ERROR: 一時ファイルを作れない" >&2; return 2; }
   awk -F '\t' 'NF >= 2 && $1 !~ /^#/ && $1 != "" {print $2}' "$manifest" | sort -u > "$rhs_tmp"
+  awk -F '\t' 'NF >= 2 && $1 !~ /^#/ && $1 != "" {print $1}' "$manifest" | sort -u > "$lhs_tmp"
   awk -F '\t' 'NF >= 2 && $1 !~ /^#/ && $1 != "" {n=$1; sub(/^.*\//, "", n); print n}' "$manifest" | sort -u > "$names_tmp"
 
   local name f rel
@@ -82,12 +85,15 @@ check_manifest_coverage() {
       [[ -z "$f" ]] && continue
       checked=$((checked+1))
       rel="${f#$root/}"
-      if ! grep -qxF "$rel" "$rhs_tmp"; then
+      # RHS（コピー先）またはLHS（正典側）に登録されていればOK
+      if ! grep -qxF "$rel" "$rhs_tmp" && ! grep -qxF "$rel" "$lhs_tmp"; then
         echo "❌ manifest未登録コピー: $rel"
         problems=$((problems+1))
       fi
     done < <(find "$root/20_Skills" -path '*/references/*' -type f -name "$name" 2>/dev/null | sort)
   done < "$names_tmp"
+
+  rm -f "$lhs_tmp"
 
   rm -f "$rhs_tmp" "$names_tmp"
   echo "--- manifest coverage: ${checked}件中 未登録${problems} ---"
