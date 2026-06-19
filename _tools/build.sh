@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Skillパッケージ化＋共通項同期の唯一の入口。手作業zipを禁じ、壊れビルド（0バイト・ルート不正・ゴミ残り）を構造的に防ぐ。
-#   bash _tools/build.sh <skillディレクトリ>  … そのSkillを正しく再パッケージ＋検証＋全体verify
+#   bash _tools/build.sh <skillディレクトリ>         … そのSkillを正しく再パッケージ＋検証＋全体verify
+#   bash _tools/build.sh --build-only <skillディレクトリ> … 対象Skillのビルド＋個別検証のみ（全verifyなし。Hook向け）
 #   bash _tools/build.sh --all                … SKILL.mdを持つ全Skillをビルド＋検証
 #   bash _tools/build.sh --verify             … 非破壊：全 .skill の健全性＋ゴミ＋ドリフトを点検（毎日の自動チェック用）
 #   bash _tools/build.sh --sync               … 正典→コピーを反映し、影響する .skill を再パッケージ＋verify
@@ -156,6 +157,10 @@ case "$cmd" in
   --sync)   do_sync; echo; verify ;;
   --sync-cc) sync_claude_code_skills ;;
   --all)    build_all; echo; verify ;;
+  --build-only)
+    skill_arg="${2:-}"
+    [[ -n "$skill_arg" ]] || { echo "usage: bash _tools/build.sh --build-only <skillディレクトリ>" >&2; exit 2; }
+    build_one "$skill_arg" ;;
   --trace)
     trace_arg="${2:-}"
     [[ -n "$trace_arg" ]] || { echo "usage: bash _tools/build.sh --trace <案件フォルダパス>" >&2; exit 2; }
@@ -163,7 +168,7 @@ case "$cmd" in
     show_trace "$trace_dir"
     ;;
   ""|-h|--help)
-    echo "usage: bash _tools/build.sh <skillディレクトリ> | --all | --verify | --sync | --sync-cc | --check | --release-check | --trace <案件フォルダ>" >&2
+    echo "usage: bash _tools/build.sh <skillディレクトリ> | --build-only <skillディレクトリ> | --all | --verify | --sync | --sync-cc | --check | --release-check | --trace <案件フォルダ>" >&2
     exit 2 ;;
   *)        build_one "$cmd"; echo; verify ;;
 esac

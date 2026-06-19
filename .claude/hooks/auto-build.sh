@@ -41,10 +41,10 @@ if [[ -f "$MANIFEST" ]] && \
   exit 0
 fi
 
-# 20_Skills配下のSKILL.mdが編集された → そのSkillを再ビルド
+# 20_Skills配下のSKILL.mdが編集された → そのSkillを再ビルド（全verifyはCIに寄せる）
 if [[ "$REL" == 20_Skills/*/SKILL.md || "$REL" == 20_Skills/*/*/SKILL.md ]]; then
   SKILL_DIR="$(dirname "$FILE_PATH")"
-  RESULT=$(bash "$PROJECT_DIR/_tools/build.sh" "$SKILL_DIR" 2>&1)
+  RESULT=$(bash "$PROJECT_DIR/_tools/build.sh" --build-only "$SKILL_DIR" 2>&1)
   EXIT_CODE=$?
   log_result "build skill ${SKILL_DIR#$PROJECT_DIR/}" "$RESULT"
   if [[ $EXIT_CODE -ne 0 ]]; then
