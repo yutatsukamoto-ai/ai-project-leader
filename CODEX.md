@@ -160,3 +160,4 @@ git status --short --branch
 - **1箇所だけ直す** → 正典を直したら `build.sh --check` でコピー側のドリフトを確認する
 - **README.md と AGENTS.md の片方だけ直す** → 両方に同じ情報がある項目（やらないこと、起動文）は両方更新する
 - **Codex版とClaude Code版を混ぜる** → Codex配布は `AGENTS.md` / `CODEX.md`、Claude Code配布は `CLAUDE.md` / `.claude/` と分ける
+- **構造変更時に波及先を忘れる** → Skill改名・追加・横断GL新設などの前に `00_プロジェクト管理/構造レビュー/規約・枠を新設するときの心得.md` の波及チェックリストを確認する

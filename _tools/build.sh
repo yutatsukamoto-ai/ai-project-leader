@@ -43,6 +43,15 @@ verify() {
   echo "=== 成果物マップ↔実構成 ==="
   check_map_consistency "$ROOT" "$ROOT/20_Skills/成果物マップ.md" || problems=$((problems+1))
 
+  echo "=== Skill名の幽霊参照 ==="
+  check_skill_name_ghosts "$ROOT" || problems=$((problems+1))
+
+  echo "=== 選定ガイドと成果物マップの整合 ==="
+  check_selection_guide_coverage "$ROOT" || problems=$((problems+1))
+
+  echo "=== 横断GL README索引の整合 ==="
+  check_gl_readme_index "$ROOT" || problems=$((problems+1))
+
   echo "=== Claude Code Skill同期 ==="
   if [[ "${CI:-}" == "true" ]]; then
     echo "ℹ️  CI環境のためスキップ"

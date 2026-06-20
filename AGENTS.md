@@ -30,6 +30,7 @@ Claude Cowork / Claude Code / Codex 向けSkill群とナレッジ基盤。
 - 実案件データは `30_Flow/` 内に置き、配布・Stock化するときは脱識別する。
 - ユーザーが実案件を「○○の件」「○○案件」などフラットに呼んだら、まず `30_Flow/実案件/案件インデックス.md` があるか確認し、該当案件の `project-context.md` と `00_案件ステータス.md` を読んでから返答する。
 - 客先提出版に内部用の検査レシートや管理メタをそのまま混ぜない。
+- Skill改名・追加・横断GL新設など構造に影響する変更を行ったら、`00_プロジェクト管理/構造レビュー/規約・枠を新設するときの心得.md` の波及チェックリストを確認する。
 - Codexでスライド作成依頼を受けたら、明示指定がない限り `image2-brand-slides` を使う。PPTXレンダー流用やDOM手組みHTMLで代替せず、`message_design.md` → `deck_structure.md` → `design_system.md` → `prompts/` → Image2生成 → HTMLデッキ化の順で進める。
 
 ## 初回案件の進め方

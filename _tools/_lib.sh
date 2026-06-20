@@ -124,6 +124,205 @@ check_map_consistency() {
   [[ $miss -eq 0 && $stale -eq 0 ]]
 }
 
+# 横断GL・テンプレート・骨子に、実在しないSkill名らしき参照が残っていないかを検査する。
+# 成果物マップは未実装候補も書くため対象外。
+check_skill_name_ghosts() {
+  local root="$1" problems=0 checked=0
+  local actual_tmp allowlist
+  actual_tmp="$(mktemp)" || { echo "ERROR: 一時ファイルを作れない" >&2; return 2; }
+  allowlist="$root/_tools/skill-name-allowlist.txt"
+
+  list_skill_dirs "$root" | while read -r d; do basename "$d"; done | sort -u > "$actual_tmp"
+
+  local targets_tmp
+  targets_tmp="$(mktemp)" || { rm -f "$actual_tmp"; echo "ERROR: 一時ファイルを作れない" >&2; return 2; }
+  {
+    find "$root/40_Stock/横断ガイドライン" -maxdepth 1 -type f -name '*.md' 2>/dev/null
+    find "$root/40_Stock/テンプレート" -maxdepth 1 -type f -name '*.md' 2>/dev/null
+    [[ -f "$root/プロジェクト骨子.md" ]] && echo "$root/プロジェクト骨子.md"
+  } | sort -u > "$targets_tmp"
+
+  local file token rel has_partial
+  while IFS= read -r file; do
+    [[ -z "$file" ]] && continue
+    while IFS= read -r token; do
+      [[ -z "$token" ]] && continue
+      checked=$((checked+1))
+
+      # 実在Skill名そのものならOK
+      if grep -qxF "$token" "$actual_tmp"; then
+        continue
+      fi
+
+      # image2-brand-slides から brand-slides だけ拾う等の部分一致は誤検知として除外
+      has_partial=0
+      while IFS= read -r skill; do
+        [[ -z "$skill" ]] && continue
+        if [[ "$skill" == *"$token"* || "$token" == *"$skill"* ]]; then
+          has_partial=1
+          break
+        fi
+      done < "$actual_tmp"
+      [[ $has_partial -eq 1 ]] && continue
+
+      # project-context 等、Skill名ではない既知のハイフン語
+      if [[ -f "$allowlist" ]] && grep -qxF "$token" "$allowlist"; then
+        continue
+      fi
+
+      rel="${file#$root/}"
+      echo "❌ 幽霊Skill名参照: $rel: $token"
+      problems=$((problems+1))
+    done < <(grep -Eoh '[a-z]+-[a-z-]+' "$file" 2>/dev/null | sed 's/^-*//; s/-*$//' | sort -u)
+  done < "$targets_tmp"
+
+  rm -f "$actual_tmp" "$targets_tmp"
+  if [[ $problems -eq 0 ]]; then
+    echo "✅ なし（候補${checked}件を確認）"
+    return 0
+  fi
+  echo "--- ghost skill refs: ${problems}件 ---"
+  return 1
+}
+
+normalize_selection_label() {
+  printf '%s' "$1" \
+    | sed 's/`//g; s/<[^>]*>//g; s/（[^）]*）//g; s/([^)]*)//g; s/[[:space:]　]//g; s/リソース/資源/g'
+}
+
+# 成果物マップにある成果物Skillが、成果物選定ガイドのランク表から漏れていないかを検査する。
+# chainや未整備候補ではなく、成果物単位の選定ガイドとの整合だけを見る。
+check_selection_guide_coverage() {
+  local root="$1" problems=0
+  local map="$root/20_Skills/成果物マップ.md"
+  local guide="$root/40_Stock/横断ガイドライン/成果物選定ガイド.md"
+  local allowlist="$root/_tools/selection-guide-allowlist.txt"
+  [[ -f "$map" ]] || { echo "❌ 成果物マップが無い: $map"; return 1; }
+  [[ -f "$guide" ]] || { echo "❌ 成果物選定ガイドが無い: $guide"; return 1; }
+
+  local map_targets guide_tokens guide_labels all_map_tokens
+  map_targets="$(mktemp)" || { echo "ERROR: 一時ファイルを作れない" >&2; return 2; }
+  guide_tokens="$(mktemp)" || { rm -f "$map_targets"; echo "ERROR: 一時ファイルを作れない" >&2; return 2; }
+  guide_labels="$(mktemp)" || { rm -f "$map_targets" "$guide_tokens"; echo "ERROR: 一時ファイルを作れない" >&2; return 2; }
+  all_map_tokens="$(mktemp)" || { rm -f "$map_targets" "$guide_tokens" "$guide_labels"; echo "ERROR: 一時ファイルを作れない" >&2; return 2; }
+
+  grep -oE '`[a-z_][a-z0-9_-]*-[a-z0-9_-]+`|[a-z]+-[a-z-]+' "$map" \
+    | tr -d '`' | sort -u > "$all_map_tokens"
+
+  local in_scope=0 line first artifact skill norm cell
+  while IFS= read -r line; do
+    case "$line" in
+      "## 本体"*|"## 前段"*) in_scope=1; continue ;;
+      "## フェーズ×"*|"## オーケストレーター"*|"## 横断・メタ"*) in_scope=0 ;;
+    esac
+    [[ $in_scope -eq 1 ]] || continue
+    [[ "$line" == \|* ]] || continue
+    skill="$(printf '%s\n' "$line" | grep -oE '`[a-z_][a-z0-9_-]*-[a-z0-9_-]+`' | head -n 1 | tr -d '`' || true)"
+    [[ -n "$skill" && "$skill" != *-chain ]] || continue
+    first="$(printf '%s\n' "$line" | awk -F'|' '{gsub(/^[ \t　]+|[ \t　]+$/, "", $2); print $2}')"
+    [[ "$first" =~ ^(0-[0-9]|0[1-5]|[0-5][[:space:]]) ]] || continue
+    artifact="$(printf '%s\n' "$line" | awk -F'|' '{gsub(/^[ \t　]+|[ \t　]+$/, "", $3); print $3}')"
+    norm="$(normalize_selection_label "$artifact")"
+    printf '%s\t%s\t%s\n' "$skill" "$artifact" "$norm" >> "$map_targets"
+  done < "$map"
+
+  awk '/^## A\./ {in_a=1; next} /^## B\./ {in_a=0} in_a {print}' "$guide" \
+    | grep -oE '`[a-z_][a-z0-9_-]*-[a-z0-9_-]+`|[a-z]+-[a-z-]+' \
+    | tr -d '`' | sort -u > "$guide_tokens" || true
+
+  while IFS= read -r line; do
+    [[ "$line" == \|* ]] || continue
+    printf '%s\n' "$line" | tr '|' '\n' | while IFS= read -r cell; do
+      cell="$(printf '%s' "$cell" | sed 's/^[ \t　]*//; s/[ \t　]*$//')"
+      [[ -z "$cell" || "$cell" == "---" || "$cell" == "フェーズ" || "$cell" == "成果物" || "$cell" == "ランク" || "$cell" == "根拠" || "$cell" == "Skill" || "$cell" == "着手トリガー（逆転条件）" ]] && continue
+      normalize_selection_label "$cell"
+      printf '\n'
+    done
+  done < <(awk '/^## A\./ {in_a=1; next} /^## B\./ {in_a=0} in_a {print}' "$guide") | sort -u > "$guide_labels"
+
+  local missing=0 orphan=0 checked=0 label
+  while IFS=$'\t' read -r skill artifact norm; do
+    [[ -z "$skill" ]] && continue
+    checked=$((checked+1))
+    if grep -qxF "$skill" "$guide_tokens" || grep -qxF "$norm" "$guide_labels"; then
+      continue
+    fi
+    if [[ -f "$allowlist" ]] && grep -qxF "$skill" "$allowlist"; then
+      continue
+    fi
+    echo "❌ 選定ガイド未収録: $skill"
+    missing=$((missing+1))
+  done < "$map_targets"
+
+  while IFS= read -r skill; do
+    [[ -z "$skill" ]] && continue
+    if grep -qxF "$skill" "$all_map_tokens"; then
+      continue
+    fi
+    if [[ -f "$allowlist" ]] && grep -qxF "$skill" "$allowlist"; then
+      continue
+    fi
+    echo "❌ 成果物マップに不在: $skill"
+    orphan=$((orphan+1))
+  done < "$guide_tokens"
+
+  rm -f "$map_targets" "$guide_tokens" "$guide_labels" "$all_map_tokens"
+  problems=$((missing+orphan))
+  if [[ $problems -eq 0 ]]; then
+    echo "✅ 整合（対象${checked}件）"
+    return 0
+  fi
+  echo "--- selection guide: 未収録${missing}・孤児${orphan} ---"
+  return 1
+}
+
+# 横断ガイドライン配下のMarkdownとREADME索引表の整合を検査する。
+check_gl_readme_index() {
+  local root="$1" problems=0
+  local dir="$root/40_Stock/横断ガイドライン"
+  local readme="$dir/README.md"
+  [[ -d "$dir" ]] || { echo "❌ 横断GLディレクトリが無い: $dir"; return 1; }
+  [[ -f "$readme" ]] || { echo "❌ 横断GL READMEが無い: $readme"; return 1; }
+
+  local actual indexed
+  actual="$(mktemp)" || { echo "ERROR: 一時ファイルを作れない" >&2; return 2; }
+  indexed="$(mktemp)" || { rm -f "$actual"; echo "ERROR: 一時ファイルを作れない" >&2; return 2; }
+
+  find "$dir" -maxdepth 1 -type f -name '*.md' ! -name 'README.md' -exec basename {} \; | sort -u > "$actual"
+  awk '
+    /^## 収録ガイドライン/ {in_section=1; next}
+    in_section && /^\|/ {in_table=1; print; next}
+    in_table && !/^\|/ {in_table=0; in_section=0}
+  ' "$readme" \
+    | grep -oE '`[^`]+\.md`' | tr -d '`' | xargs -n1 basename 2>/dev/null | sort -u > "$indexed" || true
+
+  local f missing=0 ghost=0
+  while IFS= read -r f; do
+    [[ -z "$f" ]] && continue
+    if ! grep -qxF "$f" "$indexed"; then
+      echo "❌ 横断GL README索引漏れ: $f"
+      missing=$((missing+1))
+    fi
+  done < "$actual"
+
+  while IFS= read -r f; do
+    [[ -z "$f" ]] && continue
+    if ! grep -qxF "$f" "$actual"; then
+      echo "❌ 横断GL 幽霊索引: $f"
+      ghost=$((ghost+1))
+    fi
+  done < "$indexed"
+
+  rm -f "$actual" "$indexed"
+  problems=$((missing+ghost))
+  if [[ $problems -eq 0 ]]; then
+    echo "✅ 整合"
+    return 0
+  fi
+  echo "--- gl readme index: 漏れ${missing}・幽霊${ghost} ---"
+  return 1
+}
+
 # 配布除外・履歴除外にすべきファイルがGit追跡下に残っていないかを検査する。
 # .gitignoreは新規追加を止めるだけなので、既に追跡済みの実データ/著作物/生成物はここで検出する。
 check_forbidden_tracked_paths() {
