@@ -20,6 +20,7 @@
 
 ## 状態：稼働中
 
+- `aipm-impact-log/` … AIプロジェクトリーダー利用によるBefore/After、短縮時間、品質差、判断のしやすさ、導入時のつまずきを残す横断Skill。節目の効果記録と作業中のつまずきログに使う。
 - `grill-me/` … 1問ずつ＋推奨回答で依存ツリーを潰し共通理解に達する詰めの思考道具。前段の曖昧さ潰し・保留中の決定詰めに使う。
 - `gyoumu-flow-designer/` … 業務フローを方法論に基づいて設計し、FigJam/Miro/PPTX等の描画へつなぐ横断Skill。
 - `image2-brand-slides/` … Codex版の主スライド生成Skill。ロゴ/Style Markdown/公式サイト/雰囲気からブランドルールを作り、Image2で1スライド1画像を生成し、HTMLデッキにまとめる。
