@@ -25,6 +25,14 @@
 30_Flow/**/_render/
 30_Flow/**/_quicklook/
 30_Flow/**/screenshots/
+30_Flow/**/*.docx
+30_Flow/**/*.xlsx
+30_Flow/**/*.pptx
+30_Flow/**/*.png
+30_Flow/**/*.jpg
+30_Flow/**/*.jpeg
+30_Flow/**/*.pdf
+30_Flow/**/*.html
 
 # --- 生成済みインスタンス（テンプレートから再生成可）---
 _tools/artifacts/project-dashboard.html

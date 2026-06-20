@@ -397,6 +397,15 @@ check_forbidden_tracked_paths() {
   report_tracked_matches "Flow配下の_generatedがGit管理下" ":(glob)30_Flow/**/_generated/**"
   report_tracked_matches "Flow配下の_rendersがGit管理下" ":(glob)30_Flow/**/_renders/**"
   report_tracked_matches "Flow配下の一時レンダー/スクリーンショットがGit管理下" ":(glob)30_Flow/**/_render/**" ":(glob)30_Flow/**/_quicklook/**" ":(glob)30_Flow/**/screenshots/**"
+  report_tracked_matches "Flow配下の生成バイナリがGit管理下" \
+    ":(glob)30_Flow/**/*.docx" \
+    ":(glob)30_Flow/**/*.xlsx" \
+    ":(glob)30_Flow/**/*.pptx" \
+    ":(glob)30_Flow/**/*.png" \
+    ":(glob)30_Flow/**/*.jpg" \
+    ":(glob)30_Flow/**/*.jpeg" \
+    ":(glob)30_Flow/**/*.pdf" \
+    ":(glob)30_Flow/**/*.html"
 
   while IFS= read -r f; do
     [[ -z "$f" ]] && continue
