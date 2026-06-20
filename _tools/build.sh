@@ -119,6 +119,7 @@ sync_claude_code_skills() {
   while IFS= read -r d; do
     [[ -z "$d" ]] && continue
     name="$(basename "$d")"
+    [[ "$name" == "_seikabutsu-template" ]] && continue
     rsync -a --exclude='.DS_Store' "$d/" "$cc_skills/$name/"
     count=$((count+1))
   done < <(list_skill_dirs "$ROOT" | sort -u)
@@ -134,8 +135,14 @@ check_claude_code_skill_sync() {
   fi
 
   local source_count cc_count
-  source_count="$(list_skill_dirs "$ROOT" | wc -l | tr -d ' ')"
+  source_count="$(list_skill_dirs "$ROOT" | while IFS= read -r d; do [[ "$(basename "$d")" != "_seikabutsu-template" ]] && echo "$d"; done | wc -l | tr -d ' ')"
   cc_count="$(find "$cc_skills" -mindepth 2 -maxdepth 2 -type f -name SKILL.md 2>/dev/null | wc -l | tr -d ' ')"
+
+  if [[ -e "$cc_skills/_seikabutsu-template" ]]; then
+    echo "❌ .claude/skills: 内部テンプレ _seikabutsu-template が同期されています"
+    echo "   bash _tools/build.sh --sync-cc を実行してください"
+    return 1
+  fi
 
   if [[ "$source_count" == "$cc_count" ]]; then
     echo "✅ .claude/skills: ${cc_count}/${source_count} 件同期済み"
