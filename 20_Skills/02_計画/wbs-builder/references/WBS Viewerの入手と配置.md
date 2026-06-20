@@ -10,12 +10,13 @@ WBSは2つのHTMLで見せる。役割が違う。
 ## WBS Viewer 本体の入手（一度きり）
 
 1. `https://github.com/piguo45/single-file-wbs` の **Releases** から `wbs_viewer.html` を1回だけダウンロード。
-2. **置き場（推奨）**：プロジェクト共通で使い回すので、案件フォルダではなく共有の1か所に置く。社内なら `10_参考資料/WBS Viewer/wbs_viewer.html`、配布パッケージなら同梱フォルダ。
+2. **置き場（推奨）**：プロジェクト共通で使い回すので、案件フォルダではなく共有の1か所に置く。社内なら `10_参考資料/WBS Viewer/wbs_viewer.html`。配布パッケージでは本体を同梱せず、まず本手順で外部取得を案内する。
 3. 使うとき：`wbs_viewer.html` をChrome/Edgeで開き、「ファイルを開く」で案件の `wbs.json` を読み込む。
 
 ## 配布時のルール（不可逆ガード）
 
-- WBS Viewer は**外部のMIT製品**。配布物に同梱するなら、**MITライセンスと帰属（作者: ぴぐお / single-file-wbs）を明記**する（`source-attribution-distribution-rule`／3層モデル）。
+- WBS Viewer は**外部のMIT製品**。AIプロジェクトリーダーの標準配布では同梱せず、外部取得・配置案内に留める。
+- 顧客環境やオフライン配布などで同梱が必要になった場合だけ、**MITライセンスと帰属（作者: ぴぐお / single-file-wbs）を明記**して同梱する（`source-attribution-distribution-rule`／3層モデル）。
 - 我々が生成するのは `wbs.json`＋閲覧版HTML。ビューア本体は再配布物として帰属付きで添えるだけ（改変しない）。
 
 ## 使い分けの目安

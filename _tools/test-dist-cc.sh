@@ -44,6 +44,8 @@ check_file "$DIST/CLAUDE.md"
 check_absent "$DIST/AGENTS.md"
 check_absent "$DIST/CODEX.md"
 check_absent "$DIST/.claude/settings.local.json"
+check_absent "$DIST/20_Skills/99_メタ/_seikabutsu-template"
+check_absent "$DIST/.claude/skills/_seikabutsu-template"
 
 ds_store_count="$(find "$DIST" -name .DS_Store -type f 2>/dev/null | wc -l | tr -d ' ')"
 if [[ "$ds_store_count" -eq 0 ]]; then

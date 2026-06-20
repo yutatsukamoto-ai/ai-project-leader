@@ -33,6 +33,7 @@ check_file "$DIST/20_Skills/90_横断/slide-craft/SKILL.md"
 
 check_absent "$DIST/CLAUDE.md"
 check_absent "$DIST/.claude"
+check_absent "$DIST/20_Skills/99_メタ/_seikabutsu-template"
 check_absent "$DIST/30_Flow/2026-06-17/Skillテスト_slide-craft"
 
 ds_store_count="$(find "$DIST" -name .DS_Store -type f 2>/dev/null | wc -l | tr -d ' ')"

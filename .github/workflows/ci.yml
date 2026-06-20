@@ -26,3 +26,8 @@ jobs:
           bash _tools/build.sh --sync-cc
           bash _tools/package-dist.sh --target claude-code
           bash _tools/test-dist-cc.sh
+
+      - name: Codex distribution smoke test
+        run: |
+          bash _tools/package-dist.sh --target codex
+          bash _tools/test-dist-codex.sh

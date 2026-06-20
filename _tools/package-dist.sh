@@ -51,10 +51,10 @@ if [[ "$DRY" == "--dry-run" ]]; then
   echo ""
 fi
 
-# --- L1: Skills（.skillを除く。受け手がbuild.shで再生成する） ---
-log "L1: 20_Skills/ （ソースのみ、.skill除外）"
+# --- L1: Skills（.skillと内部スケルトンを除く。受け手がbuild.shで再生成する） ---
+log "L1: 20_Skills/ （ソースのみ、.skill・内部スケルトン除外）"
 if [[ "$DRY" != "--dry-run" ]]; then
-  rsync -a --exclude='.DS_Store' --exclude='*.skill' "$ROOT/20_Skills/" "$STAGING/20_Skills/"
+  rsync -a --exclude='.DS_Store' --exclude='*.skill' --exclude='99_メタ/_seikabutsu-template/' "$ROOT/20_Skills/" "$STAGING/20_Skills/"
 fi
 
 # --- L2: 横断ガイドライン・カード・テンプレート・ナレッジ・案件教訓 ---
@@ -148,7 +148,7 @@ if [[ "$TARGET" == "claude-code" ]]; then
     [[ -f "$ROOT/CLAUDE.md" ]] || { echo "ERROR: CLAUDE.md がありません" >&2; exit 2; }
     [[ -d "$ROOT/.claude" ]] || { echo "ERROR: .claude/ がありません" >&2; exit 2; }
     cp "$ROOT/CLAUDE.md" "$STAGING/"
-    rsync -a --exclude='.DS_Store' --exclude='settings.local.json' "$ROOT/.claude/" "$STAGING/.claude/"
+    rsync -a --exclude='.DS_Store' --exclude='settings.local.json' --exclude='skills/_seikabutsu-template/' "$ROOT/.claude/" "$STAGING/.claude/"
   fi
 fi
 
@@ -177,6 +177,7 @@ log "✕ 10_参考資料/Coworkオンボーディング/"
 log "✕ 30_Flow/（全案件データ）→ 空フォルダ+READMEに置換"
 log "✕ 50_サンプル成果物/（案件固有出力）→ 空フォルダ+READMEに置換"
 log "✕ _backups/"
+log "✕ 20_Skills/99_メタ/_seikabutsu-template/（内部用コピー元）"
 log "✕ *.skill（build.shで再生成可）"
 log "✕ _tools/eval/judge-results/（判定結果はインスタンスデータ）"
 log "✕ _tools/eval/goldens.tsv（パスが案件データを参照→空テンプレに置換）"
