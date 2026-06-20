@@ -70,7 +70,7 @@ bash _tools/test-dist-codex.sh
 
 1. `00_プロジェクト管理/接続規約_前段→本体_v0.2.md`（フォルダ構造・引き継ぎ規約）
 2. `40_Stock/横断ガイドライン/` 配下の各規約（出力フォーマット・文体・図・表）
-3. `20_Skills/成果物Skill共通ひな形.md`（Skill実行の共通手順）
+3. `40_Stock/横断ガイドライン/成果物Skill共通ひな形.md`（Skill実行の共通手順）
 4. 各 `SKILL.md`（個別の成果物ルール）
 5. `README.md` / `AGENTS.md`（概要・ナビゲーション）
 
