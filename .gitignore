@@ -18,6 +18,13 @@
 
 # --- テスト生成物（バイナリ/大容量。再生成可）---
 30_Flow/テスト/Skillテスト_image2-brand-slides/sales_cubs_consulting_sample/
+30_Flow/**/export/
+30_Flow/**/final-slides/
+30_Flow/**/_generated/
+30_Flow/**/_renders/
+30_Flow/**/_render/
+30_Flow/**/_quicklook/
+30_Flow/**/screenshots/
 
 # --- 生成済みインスタンス（テンプレートから再生成可）---
 _tools/artifacts/project-dashboard.html
