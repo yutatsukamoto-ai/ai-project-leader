@@ -52,6 +52,9 @@ verify() {
   echo "=== 横断GL README索引の整合 ==="
   check_gl_readme_index "$ROOT" || problems=$((problems+1))
 
+  echo "=== chain-trace規約のSkill反映 ==="
+  check_chain_trace_propagation "$ROOT" || problems=$((problems+1))
+
   echo "=== Claude Code Skill同期 ==="
   if [[ "${CI:-}" == "true" ]]; then
     echo "ℹ️  CI環境のためスキップ"

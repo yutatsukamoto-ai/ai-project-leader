@@ -323,6 +323,35 @@ check_gl_readme_index() {
   return 1
 }
 
+# chain-trace規約が、実運用で読むchain/成果物Skillへ波及しているかを検査する。
+# 横断・メタの支援Skillは案件チェーン実行ログの対象外。ただし成果物Skillの雛形は対象に含める。
+check_chain_trace_propagation() {
+  local root="$1" problems=0 checked=0
+  local f rel
+  while IFS= read -r f; do
+    [[ -z "$f" ]] && continue
+    checked=$((checked+1))
+    if grep -q 'chain-trace\.json' "$f"; then
+      continue
+    fi
+    rel="${f#$root/}"
+    echo "❌ chain-trace未反映: $rel"
+    problems=$((problems+1))
+  done < <(
+    {
+      find "$root/20_Skills/00_前段" "$root/20_Skills/01_立ち上げ" "$root/20_Skills/02_計画" "$root/20_Skills/03_実行" "$root/20_Skills/04_監視コントロール" "$root/20_Skills/05_終結" -mindepth 2 -maxdepth 2 -type f -name SKILL.md 2>/dev/null
+      [[ -f "$root/20_Skills/99_メタ/_seikabutsu-template/SKILL.md" ]] && echo "$root/20_Skills/99_メタ/_seikabutsu-template/SKILL.md"
+    } | sort -u
+  )
+
+  if [[ $problems -eq 0 ]]; then
+    echo "✅ 反映済み（対象${checked}件）"
+    return 0
+  fi
+  echo "--- chain-trace propagation: ${problems}件 ---"
+  return 1
+}
+
 # 配布除外・履歴除外にすべきファイルがGit追跡下に残っていないかを検査する。
 # .gitignoreは新規追加を止めるだけなので、既に追跡済みの実データ/著作物/生成物はここで検出する。
 check_forbidden_tracked_paths() {
@@ -332,18 +361,42 @@ check_forbidden_tracked_paths() {
     return 0
   fi
 
-  local denied_dirs=(
+  report_tracked_matches() {
+    local label="$1"
+    shift
+    local tmp count
+    tmp="$(mktemp)" || { echo "ERROR: 一時ファイルを作れない" >&2; return 2; }
+    git -C "$root" -c core.quotePath=false ls-files -- "$@" > "$tmp"
+    count="$(grep -c . "$tmp" || true)"
+    if [[ "$count" -gt 0 ]]; then
+      echo "❌ ${label}: ${count}件"
+      sed -n '1,20p' "$tmp" | sed 's/^/   - /'
+      if [[ "$count" -gt 20 ]]; then
+        echo "   ... and $((count - 20)) more"
+      fi
+      problems=$((problems+count))
+    fi
+    rm -f "$tmp"
+  }
+
+  local denied_paths=(
     "30_Flow/2026-06-12"
+    "30_Flow/実案件"
+    "30_Flow/現在の作業セッション.md"
     "_backups"
+    "_dist"
+    "tmp"
   )
 
-  for dir in "${denied_dirs[@]}"; do
-    while IFS= read -r f; do
-      [[ -z "$f" ]] && continue
-      echo "❌ 追跡禁止パスがGit管理下: $f"
-      problems=$((problems+1))
-    done < <(git -C "$root" -c core.quotePath=false ls-files -- "$dir")
+  for f in "${denied_paths[@]}"; do
+    report_tracked_matches "追跡禁止パスがGit管理下 ($f)" "$f"
   done
+
+  report_tracked_matches "Flow配下の生成exportがGit管理下" ":(glob)30_Flow/**/export/**"
+  report_tracked_matches "Flow配下の最終レンダー画像がGit管理下" ":(glob)30_Flow/**/final-slides/**"
+  report_tracked_matches "Flow配下の_generatedがGit管理下" ":(glob)30_Flow/**/_generated/**"
+  report_tracked_matches "Flow配下の_rendersがGit管理下" ":(glob)30_Flow/**/_renders/**"
+  report_tracked_matches "Flow配下の一時レンダー/スクリーンショットがGit管理下" ":(glob)30_Flow/**/_render/**" ":(glob)30_Flow/**/_quicklook/**" ":(glob)30_Flow/**/screenshots/**"
 
   while IFS= read -r f; do
     [[ -z "$f" ]] && continue
@@ -353,17 +406,8 @@ check_forbidden_tracked_paths() {
     esac
   done < <(git -C "$root" -c core.quotePath=false ls-files -- "10_参考資料")
 
-  while IFS= read -r f; do
-    [[ -z "$f" ]] && continue
-    echo "❌ 再生成可能な.skillがGit管理下: $f"
-    problems=$((problems+1))
-  done < <(git -C "$root" -c core.quotePath=false ls-files -- "*.skill")
-
-  while IFS= read -r f; do
-    [[ -z "$f" ]] && continue
-    echo "❌ バックアップ/一時ファイルがGit管理下: $f"
-    problems=$((problems+1))
-  done < <(git -C "$root" -c core.quotePath=false ls-files -- "*.bak" ".DS_Store" ".DS_Store?")
+  report_tracked_matches "再生成可能な.skillがGit管理下" "*.skill"
+  report_tracked_matches "バックアップ/一時ファイルがGit管理下" "*.bak" ".DS_Store" ".DS_Store?"
 
   if [[ $problems -eq 0 ]]; then
     echo "✅ 追跡禁止パスなし"
@@ -438,9 +482,10 @@ PYEOF
 }
 
 # 配布前に解消すべきTODOを一覧化する。現時点ではSkill内の配布TODOを対象にする。
+# _seikabutsu-template は配布対象外のコピー元なので、意図的プレースホルダーとして除外する。
 check_distribution_todos() {
   local root="$1" hits
-  hits="$(grep -RIn --include='*.md' '配布TODO' "$root/20_Skills" 2>/dev/null | grep -v '/99_メタ/' || true)"
+  hits="$(grep -RIn --include='*.md' '配布TODO' "$root/20_Skills" 2>/dev/null | grep -v '/99_メタ/_seikabutsu-template/' || true)"
   if [[ -z "$hits" ]]; then
     echo "✅ 配布TODOなし"
     return 0
