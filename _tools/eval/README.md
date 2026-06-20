@@ -13,6 +13,23 @@ LLM出力は値の厳密一致ができないので、**ゴールデン案件＋
 - 機械層の入力＝`eval/goldens.tsv`（skill・case・パス・必須トークン）。トークンは見出しの厳密一致でなく”言い回しが変わっても残るべき核”。
 - 現在のゴールデン＝山藤12件＋テクノブリッジ10件＋スマートファクトリー2件＋丸山22件＋slide-craft構成案1件＋追加3件の計50件（2026-06-19時点）。カバーSkill: 25種。
 
+## 検証強度の分類
+
+全Skillを同じ強度でevalしない。成果物を作るSkillと、進行・思考・確認のためのSkillでは壊れ方が違う。
+
+| 対象 | 例 | 守り方 |
+|---|---|---|
+| 成果物Skill | `anken-rikai-summary`、`project-charter`、`risk-plan`、`status-report` | `goldens.tsv` の核トークン検査＋必要時の目視層 |
+| chain / オーケストレーター | `zendan-chain`、`tachiage-chain`、`keikaku-chain` | 入力・順番・停止ポイント・書き戻し指示の静的確認。成果物トークン検査へ無理に載せない |
+| メタSkill / 思考道具 | `grill-me`、`ichi-kakunin`、`skill-kabeuchi-kickoff` | サンプル会話またはトリガーsmoke。出力文書の核トークン検査は原則不要 |
+| スライド系 | `image2-brand-slides`、`slide-craft`、`slide-quality-check` | 代表ケースのsmoke、生成フォルダ構造、レビュー観点の存在確認。大量レンダー画像はGit管理しない |
+
+判断基準:
+
+- 次工程の正典成果物になるものは機械evalに載せる。
+- 進行制御・確認・壁打ちの道具は、サンプル会話や静的検査で守る。
+- 生成画像・PPTX・HTMLの大量サンプルは回帰evalの主対象にしない。必要なら最小代表だけ `50_サンプル成果物/` に置く。
+
 ## いつ流すか
 
 1. **Skill改訂時**: そのSkillを `bash _tools/eval.sh <skill>` で点検＋目視チェックリストの該当節。
