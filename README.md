@@ -18,7 +18,7 @@
 | メタSkill | 2（壁打ちキックオフ・位置確認）＋内部テンプレ1（非配布） |
 | chain | 6（フェーズ別オーケストレーター） |
 | パッケージ | 37 `.skill` |
-| 回帰テスト | 50件のゴールデン（LLM-judge用プロンプト生成あり） |
+| 回帰テスト | 51件のゴールデン（LLM-judge用プロンプト生成あり） |
 | 模擬完走 | 4案件で全フェーズ検証済み |
 
 ---
@@ -192,11 +192,13 @@ bash _tools/build.sh --all
 push / PR で GitHub Actions が自動実行します（`.github/workflows/ci.yml`）。
 
 - **構造健全性** (`build.sh --verify`): .skill の壊れ・ゴミ・共通項ドリフト・マップ整合
-- **回帰eval 機械層** (`eval.sh`): 50件のゴールデンに対するファイル存在＋核トークン検査
+- **回帰eval 機械層** (`eval.sh`): 51件のゴールデンに対するファイル存在＋核トークン検査
 - **Claude Code Hooks smoke** (`test-hooks.sh`): gate-check / auto-build / auto-eval / subagent定義の静的・擬似stdin検査
 - **Claude Code配布 smoke** (`build.sh --sync-cc` → `package-dist.sh --target claude-code` → `test-dist-cc.sh`): `.claude/skills/` 同期と配布物の危険物混入検査
 
-LLM-judge（目視層）は API コスト・判定の再現性の都合で手動運用としています。`bash _tools/eval-judge.sh` でプロンプトを自動生成し、Claude 等で判定します。
+LLM-judge（目視層）は API コスト・判定の再現性の都合で手動運用としています。
+`bash _tools/eval-judge.sh <skill>` でプロンプトを生成し、Claude 等で判定した結果を `_tools/eval/judge-results/result_{skill}_{case}.md` に保存します。
+保存後は `bash _tools/eval-judge.sh --check <skill>` で結果ファイルの有無と pass/fail を確認します。
 
 ### Codex配布
 
@@ -269,9 +271,11 @@ Codex配布版には `AGENTS.md` と `CODEX.md` を含めます。Claude Code配
 | 用途 | 場所 |
 |---|---|
 | 全体思想・ロードマップ | [`プロジェクト骨子.md`](プロジェクト骨子.md) |
+| AIエージェントの作業入口 | [`AGENTS.md`](AGENTS.md) / [`CODEX.md`](CODEX.md) |
+| 決まったことの索引 | [`00_プロジェクト管理/構造レビュー/決定の索引.md`](00_プロジェクト管理/構造レビュー/決定の索引.md) |
 | 成果物とSkillの対応表 | [`20_Skills/成果物マップ.md`](20_Skills/成果物マップ.md) |
+| Skill別に読む横断ガイドライン | [`20_Skills/横断GL対応表.md`](20_Skills/横断GL対応表.md) |
 | 案件フォルダの命名規約 | [`30_Flow/README.md`](30_Flow/README.md) |
 | 文章・図・表の共通ルール | [`40_Stock/横断ガイドライン/`](40_Stock/横断ガイドライン/) |
 | PMBOK基準資料 | [`10_参考資料/PMBOK第8版_40プロセス一覧.md`](10_参考資料/PMBOK第8版_40プロセス一覧.md) |
-| 懸念と残タスク | [`00_プロジェクト管理/構造レビュー/懸念マスター.md`](00_プロジェクト管理/構造レビュー/懸念マスター.md) |
-| Codex作業ルール | [`CODEX.md`](CODEX.md) |
+| 未決課題・懸念・解決ログ | [`00_プロジェクト管理/構造レビュー/懸念マスター.md`](00_プロジェクト管理/構造レビュー/懸念マスター.md) |

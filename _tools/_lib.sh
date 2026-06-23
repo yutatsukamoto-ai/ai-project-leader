@@ -323,6 +323,106 @@ check_gl_readme_index() {
   return 1
 }
 
+check_golden_count_mentions() {
+  local root="$1" problems=0 checked=0 count manifest file rel hit line_no text mentions num
+  manifest="$root/_tools/eval/goldens.tsv"
+  [[ -f "$manifest" ]] || { echo "❌ goldens.tsv が無い: $manifest"; return 1; }
+
+  count="$(awk 'BEGIN{c=0} /^[[:space:]]*#/ || /^[[:space:]]*$/ {next} {c++} END{print c}' "$manifest")"
+  for file in "$root/README.md" "$root/プロジェクト骨子.md" "$root/_tools/eval/README.md"; do
+    [[ -f "$file" ]] || continue
+    rel="${file#$root/}"
+    while IFS= read -r hit; do
+      [[ -z "$hit" ]] && continue
+      line_no="${hit%%:*}"
+      text="${hit#*:}"
+      mentions="$(printf '%s\n' "$text" | grep -Eo '([0-9]+)件のゴールデン|ゴールデン[0-9]+件|計[0-9]+件' || true)"
+      while IFS= read -r num; do
+        [[ -z "$num" ]] && continue
+        checked=$((checked+1))
+        if [[ "$num" != "$count" ]]; then
+          echo "❌ ゴールデン件数の表記ズレ: ${rel}:${line_no}: ${num}件（実数${count}件）"
+          problems=$((problems+1))
+        fi
+      done < <(printf '%s\n' "$mentions" | grep -Eo '[0-9]+' || true)
+    done < <(grep -nE '([0-9]+)件のゴールデン|ゴールデン[0-9]+件|ゴールデン.*計[0-9]+件' "$file" 2>/dev/null || true)
+  done
+
+  if [[ $problems -eq 0 ]]; then
+    echo "✅ ゴールデン件数表記: ${checked}箇所が実数${count}件と一致"
+    return 0
+  fi
+  echo "--- golden count mentions: ${problems}件 ---"
+  return 1
+}
+
+check_gl_key_table_index() {
+  local root="$1" problems=0
+  local dir="$root/40_Stock/横断ガイドライン"
+  local table="$root/20_Skills/横断GL対応表.md"
+  [[ -d "$dir" ]] || { echo "❌ 横断GLディレクトリが無い: $dir"; return 1; }
+  [[ -f "$table" ]] || { echo "❌ 横断GL対応表が無い: $table"; return 1; }
+
+  local actual indexed f missing=0 ghost=0
+  actual="$(mktemp)" || { echo "ERROR: 一時ファイルを作れない" >&2; return 2; }
+  indexed="$(mktemp)" || { rm -f "$actual"; echo "ERROR: 一時ファイルを作れない" >&2; return 2; }
+
+  find "$dir" -maxdepth 1 -type f -name '*.md' ! -name 'README.md' -exec basename {} \; | sort -u > "$actual"
+  awk '
+    /^## 横断GLキー/ {in_section=1; next}
+    in_section && /^---/ {exit}
+    in_section {print}
+  ' "$table" \
+    | grep -oE '`40_Stock/横断ガイドライン/[^`]+\.md`' \
+    | tr -d '`' | xargs -n1 basename 2>/dev/null | sort -u > "$indexed" || true
+
+  while IFS= read -r f; do
+    [[ -z "$f" ]] && continue
+    if ! grep -qxF "$f" "$indexed"; then
+      echo "❌ 横断GLキー表の索引漏れ: $f"
+      missing=$((missing+1))
+    fi
+  done < "$actual"
+
+  while IFS= read -r f; do
+    [[ -z "$f" ]] && continue
+    if ! grep -qxF "$f" "$actual"; then
+      echo "❌ 横断GLキー表の幽霊索引: $f"
+      ghost=$((ghost+1))
+    fi
+  done < "$indexed"
+
+  rm -f "$actual" "$indexed"
+  problems=$((missing+ghost))
+  if [[ $problems -eq 0 ]]; then
+    echo "✅ 横断GLキー表: 整合"
+    return 0
+  fi
+  echo "--- gl key table: 漏れ${missing}・幽霊${ghost} ---"
+  return 1
+}
+
+check_deprecated_project_status_refs() {
+  local root="$1" hits
+  hits="$(grep -RIn --include='*.md' '00_案件ステータス\.md' \
+    "$root/AGENTS.md" "$root/CLAUDE.md" "$root/CODEX.md" "$root/README.md" "$root/30_Flow/README.md" 2>/dev/null || true)"
+  if [[ -z "$hits" ]]; then
+    echo "✅ 旧案件ステータス入口参照なし"
+    return 0
+  fi
+  echo "$hits" | sed "s#$root/##" | sed 's/^/❌ /'
+  echo "--- deprecated project status refs: $(printf '%s\n' "$hits" | grep -c .)件 ---"
+  return 1
+}
+
+check_entry_doc_freshness() {
+  local root="$1" problems=0
+  check_golden_count_mentions "$root" || problems=$((problems+1))
+  check_gl_key_table_index "$root" || problems=$((problems+1))
+  check_deprecated_project_status_refs "$root" || problems=$((problems+1))
+  [[ $problems -eq 0 ]]
+}
+
 # chain-trace規約が、実運用で読むchain/成果物Skillへ波及しているかを検査する。
 # 横断・メタの支援Skillは案件チェーン実行ログの対象外。ただし成果物Skillの雛形は対象に含める。
 check_chain_trace_propagation() {

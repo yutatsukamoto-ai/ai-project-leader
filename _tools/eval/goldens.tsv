@@ -59,6 +59,7 @@ resource-management	丸山	30_Flow/模擬案件/模擬案件_丸山製作所/03_
 poc-evaluation	スマートファクトリー	30_Flow/模擬案件/模擬案件_スマートファクトリー_設備稼働IoT/05_終結/02_PoC評価報告書_v0.1.md	評価概要||評価結果||ノックアウトファクター||Go/NoGo||条件付きGo
 # --- 横断Skill 追加golden（2026-06-17）---
 slide-craft	構成案	30_Flow/テスト/Skillテスト_slide-craft/outputs/slide-craft_構成案_v0.1.md	メッセージ設計||構造型||1スライド1メッセージ||白黒先行||提出前レビュー
+image2-brand-slides	主ルートsmoke	_tools/eval/fixtures/image2-brand-slides/minimal_deck/export/html/index.html	HTMLデッキ||file:_tools/eval/fixtures/image2-brand-slides/minimal_deck/input_manifest.md||file:_tools/eval/fixtures/image2-brand-slides/minimal_deck/message_design.md||file:_tools/eval/fixtures/image2-brand-slides/minimal_deck/deck_structure.md||file:_tools/eval/fixtures/image2-brand-slides/minimal_deck/design_system.md||file:_tools/eval/fixtures/image2-brand-slides/minimal_deck/prompts/01-title.md
 # --- 入力形式テスト anken-rikai-summary 追加golden（2026-06-18）---
 anken-rikai-summary	録音文字起こし入力検証	30_Flow/テスト/Skillテスト_録音文字起こし入力検証/00_前段/01_案件理解サマリー_v0.1.md	クライアント概要||相談の経緯||期待の構造化||制約・条件||事実と推測||不明点とヒアリング質問||理解で合っていますか
 anken-rikai-summary	メールスレッド入力検証	30_Flow/テスト/Skillテスト_メールスレッド入力検証/00_前段/01_案件理解サマリー_v0.1.md	クライアント概要||相談の経緯||期待の構造化||制約・条件||事実と推測||不明点とヒアリング質問||理解で合っていますか
