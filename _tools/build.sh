@@ -58,6 +58,9 @@ verify() {
   echo "=== 入口文書の鮮度 ==="
   check_entry_doc_freshness "$ROOT" || problems=$((problems+1))
 
+  echo "=== 参照ファイルのGit追跡 ==="
+  check_referenced_files_tracked "$ROOT" || problems=$((problems+1))
+
   echo "=== Claude Code Skill同期 ==="
   if [[ "${CI:-}" == "true" ]]; then
     echo "ℹ️  CI環境のためスキップ"

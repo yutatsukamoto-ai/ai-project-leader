@@ -423,6 +423,76 @@ check_entry_doc_freshness() {
   [[ $problems -eq 0 ]]
 }
 
+is_git_tracked() {
+  local root="$1" rel="$2"
+  git -C "$root" ls-files --error-unmatch -- "$rel" >/dev/null 2>&1
+}
+
+check_referenced_files_tracked() {
+  local root="$1" problems=0 checked=0
+  if ! git -C "$root" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    echo "ℹ️  Git管理外のためスキップ"
+    return 0
+  fi
+
+  local eval_manifest="$root/_tools/eval/goldens.tsv"
+  local sync_manifest="$root/_tools/sync-manifest.tsv"
+  local skill kase path tokens t required_path master copy rel optional
+
+  if [[ -f "$eval_manifest" ]]; then
+    while IFS=$'\t' read -r skill kase path tokens; do
+      [[ -z "${skill// }" || "${skill:0:1}" == "#" ]] && continue
+      for rel in "$path"; do
+        checked=$((checked+1))
+        if [[ -e "$root/$rel" ]] && ! is_git_tracked "$root" "$rel"; then
+          echo "❌ eval参照ファイルが未追跡: $rel"
+          problems=$((problems+1))
+        fi
+      done
+      IFS='|' read -ra toks <<< "${tokens//||/|}"
+      for t in "${toks[@]}"; do
+        [[ "$t" == file:* ]] || continue
+        required_path="${t#file:}"
+        checked=$((checked+1))
+        if [[ -e "$root/$required_path" ]] && ! is_git_tracked "$root" "$required_path"; then
+          echo "❌ eval file:参照が未追跡: $required_path"
+          problems=$((problems+1))
+        fi
+      done
+    done < "$eval_manifest"
+  fi
+
+  if [[ -f "$sync_manifest" ]]; then
+    while IFS=$'\t' read -r master copy _; do
+      [[ -z "${master// }" || "${master:0:1}" == "#" ]] && continue
+      for rel in "$master" "$copy"; do
+        checked=$((checked+1))
+        if [[ -e "$root/$rel" ]] && ! is_git_tracked "$root" "$rel"; then
+          echo "❌ sync-manifest参照ファイルが未追跡: $rel"
+          problems=$((problems+1))
+        fi
+      done
+    done < "$sync_manifest"
+  fi
+
+  for optional in _tools/skill-name-allowlist.txt _tools/selection-guide-allowlist.txt; do
+    if [[ -s "$root/$optional" ]]; then
+      checked=$((checked+1))
+      if ! is_git_tracked "$root" "$optional"; then
+        echo "❌ verifyに影響する任意ファイルが未追跡: $optional"
+        problems=$((problems+1))
+      fi
+    fi
+  done
+
+  if [[ $problems -eq 0 ]]; then
+    echo "✅ 参照ファイル追跡: ${checked}件を確認"
+    return 0
+  fi
+  echo "--- referenced tracked files: ${problems}件 ---"
+  return 1
+}
+
 # chain-trace規約が、実運用で読むchain/成果物Skillへ波及しているかを検査する。
 # 横断・メタの支援Skillは案件チェーン実行ログの対象外。ただし成果物Skillの雛形は対象に含める。
 check_chain_trace_propagation() {
