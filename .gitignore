@@ -37,6 +37,9 @@
 # --- 生成済みインスタンス（テンプレートから再生成可）---
 _tools/artifacts/project-dashboard.html
 50_サンプル成果物/*
+!50_サンプル成果物/README.md
+!50_サンプル成果物/md/
+!50_サンプル成果物/md/**
 !50_サンプル成果物/html/
 50_サンプル成果物/html/*
 !50_サンプル成果物/html/成果物マップ_showcase.html
